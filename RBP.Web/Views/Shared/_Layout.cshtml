@@ -1,0 +1,207 @@
+﻿@model ClientBasedViewModel
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.PageTitle</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body,
+        html {
+            height: 100%;
+        }
+
+        #_layout {
+            position: relative;
+        }
+
+        #_menu {
+            position: absolute;
+            overflow-x: hidden;
+            overflow-y: auto;
+            width: 250px;
+            top: 50px;
+            left: -250px;
+        }
+
+        #_content {
+            position: absolute;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        #_header {
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 50px;
+            position: absolute;
+            max-width: 100%;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="bg-primary mx-auto" id="_layout">
+        <div class="d-flex align-items-center border-bottom" id="_header">
+            <button class="btn btn-light ml-2" id="menu_toggler" style="width: 50px; height: 38px;">
+                <svg version="1.1" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+                    <path pid="0" fill-rule="evenodd" clip-rule="evenodd"
+                          d="M23 5.75a.75.75 0 01-.75.75H1.75a.75.75 0 010-1.5h20.5a.75.75 0 01.75.75zm0 6a.75.75 0 01-.75.75H1.75a.75.75 0 010-1.5h20.5a.75.75 0 01.75.75zm-.75 6.75a.75.75 0 000-1.5H1.75a.75.75 0 000 1.5h20.5z"
+                          fill="#000"></path>
+                </svg>
+            </button>
+            <div class="mx-3">
+                <img src="/img/logo-lg.svg" style="height: 20px;">
+            </div>
+            <div class="ml-auto mr-3">
+                <p class="my-auto text-nowrap text-right" style="overflow-x: hidden; overflow-y: hidden;">@Model.ClientShortName</p>
+                <p class="my-auto text-nowrap small text-muted text-right" style="overflow-x: hidden; overflow-y: hidden;">@Model.ClientRoleTitle</p>
+            </div>
+        </div>
+        <div class="bg-white" id="_content">
+            @RenderBody()
+        </div>
+        <div class="bg-white border-right" id="_menu">
+            <div class="m-2">
+                @foreach (var pare in Model.MenuOptions)
+                {
+                    <a class="btn-link" href="@pare.Value">
+                        <button class="btn btn-light btn-block text-left">@pare.Key</button>
+                    </a>
+                }
+                
+                <a class="btn-link" href="/Account/Logout">
+                    <button class="btn btn-danger btn-block text-left">Выйти</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        const header_h = 50;
+        const menu_w = 250;
+        const sm_screen = 1024;
+        var menu = $("#_menu");
+        var content = $("#_content");
+        var layout = $("#_layout");
+        var toggler = $("#menu_toggler");
+        var win = $(window);
+        var is_menu_animation_busy = false;
+        var is_menu_open = false;
+        var is_refreshed = false;
+        var is_past_screen_was_small = false;
+
+        menu.hide();
+
+        function open_menu() {
+            if (is_menu_open || is_menu_animation_busy) {
+                return;
+            }
+
+            menu.show();
+            menu.animate({
+                left: "+=" + menu_w + "px",
+            }, 300, function () {
+                is_menu_animation_busy = false;
+            });
+
+            is_menu_open = true;
+        }
+
+        function close_menu() {
+            if (!is_menu_open || is_menu_animation_busy) {
+                return;
+            }
+
+            menu.animate({
+                left: "-=" + menu_w + "px",
+            }, 300, function () {
+                menu.hide();
+                is_menu_animation_busy = false;
+            });
+
+            is_menu_open = false;
+        }
+
+        function is_screen_small() {
+            var w = layout.width();
+            return w < sm_screen;
+        }
+
+        function refresh() {
+            var w = layout.width();
+            var h = win.height();
+
+            if (is_screen_small()) {
+                content.css({ top: header_h, left: 0 });
+                content.width(w);
+                content.height(h - header_h);
+                menu.height(h - header_h);
+                toggler.show();
+                if (is_past_screen_was_small == false) {
+                    close_menu();
+                }
+                is_past_screen_was_small = true;
+            } else {
+                content.css({ top: header_h, left: menu_w });
+                content.width(w - menu_w);
+                content.height(h - header_h);
+                menu.height(h - header_h);
+                toggler.hide();
+                open_menu();
+                is_past_screen_was_small = false;
+            }
+
+            is_refreshed = true;
+        }
+
+        win.resize(refresh);
+
+        toggler.click(function () {
+            if (is_menu_open) {
+                close_menu();
+            } else {
+                open_menu();
+            }
+        });
+
+        win.click(function (e) {
+            if (is_menu_open == false || is_screen_small() == false) {
+                return;
+            }
+            if (e.pageX > menu_w && e.pageY > header_h) {
+                close_menu();
+            }
+        });
+
+        setInterval(function () {
+            if (is_refreshed == false) {
+                return;
+            }
+
+            var w = layout.width();
+            var h = win.height();
+            if (w < sm_screen) {
+                content.css({ top: header_h, left: 0 });
+                content.width(w);
+                content.height(h - header_h);
+                menu.height(h - header_h);
+            }
+
+            is_refreshed = false;
+        }, 500)
+
+        refresh();
+    </script>
+</body>
+</html>

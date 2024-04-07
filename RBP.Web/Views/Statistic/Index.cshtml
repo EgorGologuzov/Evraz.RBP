@@ -1,0 +1,75 @@
+﻿@using RBP.Web.Utils
+@using System.Collections.Generic
+@using System.Globalization
+@model SegmentStatisticViewModel
+
+@{
+    var format = "dd MMM";
+    var provider = CultureInfo.CreateSpecificCulture("ru-RU");
+}
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        <div class="row m-0 pt-2">
+            <div class="segment p-0 col-12 col-lg-6">
+                <div class="card h-100 mr-lg-1">
+                    <a class="h-100" style="color: black; text-decoration: none;">
+                        <div class="card-body">
+                            <h5 class="card-title m-0 mb-2">Цех РБП</h5>
+                            <div>
+                                @Html.DistributionBar(
+                                            title: $"На хранениии (на {Model.End.Value.ToString(format, provider)})",
+                                            data: Model.Statistic.ProductsInStorageNow
+                                            )
+                                @Html.DistributionBar(
+                                            title: $"Отгружено (посл. {(Model.End - Model.Start).Value.Days} дней)",
+                                            data: Model.Statistic.ShippedProductsForPeriod
+                                            )
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="chart p-0 col-12 col-lg-6 d-none d-lg-inline">
+                <div class="card h-100 ml-lg-1">
+                    <a class="h-100 d-flex flex-column" style="color: black; text-decoration: none;">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title m-0">Динамика хранения (@Model.Start.Value.ToString(format, provider) - @Model.End.Value.ToString(format, provider))</h5>
+                        </div>
+                        @Html.ChartOneLine(
+                                    data: Model.Statistic.WeightInStorageDynamic.Select(w => KeyValuePair.Create(w.Key.ToString(format, provider), w.Value))
+                                    )
+                    </a>
+                </div>
+            </div>
+        </div>
+        <h3 class="mt-2">Статистика сегментов</h3>
+        <div class="row m-0 pt-2">
+            @if (Model.AllSegments is not null && Model.AllSegments.Count != 0)
+            {
+                @foreach (var entity in Model.AllSegments)
+                {
+                    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 pr-1 pl-0 pb-1">
+                        <div class="card h-100">
+                            <a class="h-100" href="/Statistic/Segment?SegmentId=@entity.Id" style="color: black; text-decoration: none;">
+                                <div class="card-body">
+                                    <h5 class="card-title m-0">@entity.Name</h5>
+                                    <p class="card-text">@entity.Comment</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center w-100">Ничего не найдено</p>
+            }
+        </div>
+    </main>
+    <footer>
+    </footer>
+</div>

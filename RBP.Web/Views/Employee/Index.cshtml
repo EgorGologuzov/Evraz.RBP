@@ -1,0 +1,45 @@
+﻿@using RBP.Web.Utils
+@model EmployeeListViewModel
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+        @Html.SearchForm(
+            action: "/Employee/Index",
+            placeholder: "ФИО",
+            value: Model.SearchRequest
+        )
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        <div class="row pt-2 m-0">
+            @if (Model.Employees is not null && Model.Employees.Count != 0)
+            {
+                @foreach (var employee in Model.Employees)
+                {
+                    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 pr-1 pl-0 pb-1">
+                        <div class="card h-100">
+                            <a class="h-100" href="/Employee/Edit?Id=@employee.EmployeeAccount.Id" style="color: black; text-decoration: none;">
+                                <div class="card-body">
+                                    <h5 class="card-title m-0">@employee.EmployeeAccount.Name</h5>
+                                    <h6 class="card-subtitle mb-1 text-muted m-0">@employee.Segment.Name</h6>
+                                    @if (employee.EmployeeAccount.IsActive == false)
+                                    {
+                                        <p class="small text-danger mb-1">Не активен</p>
+                                    }
+                                    <p class="card-text">Возраст: @(DateTime.Now.Year - employee.EmployeeData.BirthDate.Year) лет  Стаж: @(DateTime.Now.Year - employee.EmployeeData.EmploymentDate.Year) лет</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @Html.EmptyView()
+            }
+        </div>
+    </main>
+    <footer>
+        <a class="btn btn-primary btn-block" href="/Employee/Create">Добавить</a>
+    </footer>
+</div>

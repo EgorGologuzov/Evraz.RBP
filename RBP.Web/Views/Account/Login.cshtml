@@ -1,0 +1,56 @@
+﻿@using RBP.Web.Utils
+@model LoginViewModel
+@{
+    Layout = "_EmptyBody";
+    ViewData["Title"] = "Вход - СОВ РБП";
+}
+
+<div b-hgk6rzzoc3 class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="p-2" style="max-width: 400px; width: 100%;">
+        <form method="post" asp-controller="Account" asp-action="Login" class="form-signin need-validate">
+            <div class="text-start mb-4">
+                <img class="mt-4 mb-4" alt="" width="160" src="~/img/logo-lg.svg">
+                <div class="text-start">
+                    <p class="font-weight-bold">Система оборота ведомостей РБП</p>
+                    <p class="h2 mt-3 font-weight-normal">Авторизация</p>
+                </div>
+            </div>
+
+            @Html.PrefixTextBox(
+                name: nameof(Model.Phone),
+                value: Model.Phone,
+                label: "Номер телефона",
+                prefix: "+7",
+                placeholder: "9999999999",
+                type: "login",
+                regex: @"^\d{10}$",
+                invalidFeedback: "Номер должен состоять из 10 цифр"
+            )
+
+            @Html.TextBox(
+                name: nameof(Model.Password),
+                value: Model.Password,
+                label: "Пароль",
+                placeholder: "Введите пароль",
+                type:"password",
+                regex: ".+",
+                invalidFeedback: "Пароль должен содержать минимум 8 символов"
+            )
+
+            <input type="hidden" asp-for="AttemptNumber" value="@Model.AttemptNumber">
+            
+            @if (Model.AttemptNumber != 0)
+            {
+                <div class="card error-message border-danger my-3">
+                    <div class="card-body text-danger px-3 py-1">
+                        <p class="card-text small">Неверный логин или пароль</p>
+                    </div>
+                </div>
+            }
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit" id="loginButton">Войти</button>
+
+            <p class="mt-3">Если возникли проблемы при авторизации - обратитесь к системному администратору.</p>
+        </form>
+    </div>
+</div>

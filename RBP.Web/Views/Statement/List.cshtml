@@ -1,0 +1,52 @@
+﻿@using System.Globalization
+@using RBP.Services
+@model StatementListViewModel
+
+@{
+    var provider = CultureInfo.CreateSpecificCulture("ru-RU");
+}
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+        <form method='post' action='/Statement/List' class='my-auto' style='max-width: 550px; display: flex; flex-direction: row;'>
+            <input type="hidden" name="@nameof(Model.SegmentId)" value="@Model.SegmentId"/>
+            <div class='form-group my-0 mr-2' style='flex: 1; max-width: 550px;'>
+                <input name='@nameof(Model.Date)' type='date' class='form-control' value='@Model.Date.ToString("yyyy-MM-dd")'>
+            </div>
+            <button type='submit' class='btn btn-primary'>Найти</button>
+        </form>
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        <div class="row pt-2 m-0">
+            @if (Model.Statements is not null && Model.Statements.Count != 0)
+            {
+                @foreach (var vm in Model.Statements)
+                {
+                    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 pr-1 pl-0 pb-1">
+                        <div class="card h-100">
+                            <a class="h-100" href="/Statement/Edit?Id=@vm.Statement.Id" style="color: black; text-decoration: none;">
+                                <div class="card-body">
+                                    <h5 class="card-title m-0">@string.Format("{0} ({1} кг.)", vm.Statement.Product.Name, vm.Statement.Weight.ToString())</h5>
+                                    <h6 class="card-subtitle mb-1 text-muted m-0">@vm.Statement.Date.ToString("D", provider)</h6>
+                                    <p class="card-text">@vm.Statement.Responsible.Name</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center w-100">Ничего не найдено</p>
+            }
+        </div>
+    </main>
+    <footer>
+        @if (Model.ClientInRoles(ClientRoles.Employee))
+        {
+            <a class="btn btn-primary btn-block" href="/Statement/Create?SegmentId=@Model.SegmentId">Добавить</a>
+        }
+    </footer>
+</div>
+

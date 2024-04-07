@@ -1,0 +1,97 @@
+﻿@using Microsoft.AspNetCore.Html
+@using RBP.Web.Utils
+@model ProductViewModel
+
+@{
+    string fieldName = nameof(Model.Product.PropertiesJson);
+    string propertyViewKey = ProductViewModel.PropertyViewKey;
+    string propertyViewValue = ProductViewModel.PropertyViewValue;
+}
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            @Html.ErrorMessage(Model.ErrorMessage)
+        }
+        @if (!string.IsNullOrEmpty(Model.OkMessage))
+        {
+            @Html.OkMessage(Model.OkMessage)
+        }
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        @Html.ListInputForm(
+            targetInputId: fieldName,
+            viewKey: propertyViewKey,
+            viewValue: propertyViewValue,
+            caption: "Свойства",
+            controls: new List<IHtmlContent>()
+            {
+                Html.AdaptiveTextBox(
+                name: "Key",
+                placeholder: "Название",
+                regex: "^.{1,40}$",
+                invalidFeedback: "Длина должна быть от 1 до 40 символов",
+                bootstrapGridModes: "col-sm-12 col-md-6"
+                ),
+                Html.AdaptiveTextBox(
+                name: "Value",
+                placeholder: "Значение",
+                regex: "^.{1,40}$",
+                invalidFeedback: "Длина должна быть от 1 до 40 символов",
+                bootstrapGridModes: "col-sm-12 col-md-6"
+                ),
+            }
+        )
+        <form class="need-validate py-2" method="post" action="/Product/Create">
+            <div class="form-row">
+                @Html.HiddenInput(
+                         name: nameof(Model.Product.Id),
+                         value: Model.Product.Id.ToString()
+                         )
+
+                @Html.HiddenInput(
+                         name: nameof(Model.Product.PropertiesJson),
+                         value: Model.Product.PropertiesJson
+                         )
+
+                @Html.AdaptiveTextBox(
+                         name: nameof(Model.Product.Name),
+                         value: Model.Product.Name,
+                         label: "Имя",
+                         placeholder: "Название",
+                         regex: "^.{1,40}$",
+                         invalidFeedback: "Название должно содержать от 1 до 40 символов."
+                         )
+
+                @Html.AdaptiveSelect(
+                         name: nameof(Model.Product.ProfileId),
+                         label: "Профиль",
+                         value: Model.Product.ProfileId.ToString(),
+                         items: Model.AllProfiles.Select(p => new KeyValuePair<string, string>(p.Name, p.Id.ToString()))
+                         )
+
+                @Html.AdaptiveSelect(
+                         name: nameof(Model.Product.SteelId),
+                         label: "Марка стали",
+                         value: Model.Product.SteelId.ToString(),
+                         items: Model.AllSteels.Select(s => new KeyValuePair<string, string>(s.Name, s.Id.ToString()))
+                         )
+
+                @Html.AdaptiveTextarea(
+                         name: nameof(Model.Product.Comment),
+                         label: "Комментарий",
+                         value: Model.Product.Comment,
+                         maxLength: 150
+                         )
+            </div>
+            <div class="form-row" style="margin: 0px;">
+                <button class="btn btn-primary ml-auto save-button" disabled type="submit">Сохранить</button>
+            </div>
+        </form>
+    </main>
+    <footer>
+        
+    </footer>
+</div>

@@ -1,0 +1,35 @@
+﻿@model HandbookEntityListViewModel
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        <div class="row pt-2 m-0">
+            @if (Model.Entities is not null && Model.Entities.Count != 0)
+            {
+                @foreach (var entity in Model.Entities)
+                {
+                    <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 pr-1 pl-0 pb-1">
+                        <div class="card h-100">
+                            <a class="h-100" href="/Statement/List?SegmentId=@entity.Id&Date=@DateTime.Now.ToString("yyyy-MM-dd")" style="color: black; text-decoration: none;">
+                                <div class="card-body">
+                                    <h5 class="card-title m-0">@entity.Name</h5>
+                                    <p class="card-text">@entity.Comment</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center w-100">Ничего не найдено</p>
+            }
+        </div>
+    </main>
+    <footer>
+    </footer>
+</div>
+
+

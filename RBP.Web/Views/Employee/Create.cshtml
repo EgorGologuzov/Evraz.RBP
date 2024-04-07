@@ -1,0 +1,81 @@
+﻿@using RBP.Web.Utils
+@model EmployeeViewModel
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            @Html.ErrorMessage(Model.ErrorMessage)
+        }
+        @if (!string.IsNullOrEmpty(Model.OkMessage))
+        {
+            @Html.OkMessage(Model.OkMessage)
+        }
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        <form class="need-validate py-2" method="post" action="/Employee/Create">
+            <div class="form-row">
+                @Html.AdaptivePrefixTextBox(
+                         name: nameof(Model.EmployeeAccount.Phone),
+                         value: Model.EmployeeAccount.Phone,
+                         label: "Номер телефона",
+                         prefix: "+7",
+                         placeholder: "9999999999",
+                         regex: @"^\d{10}$",
+                         invalidFeedback: "Номер должен состоять из 10 цифр"
+                         )
+
+                @Html.AdaptiveTextBox(
+                         name: nameof(Model.EmployeeAccount.Name),
+                         value: Model.EmployeeAccount.Name,
+                         label: "ФИО",
+                         placeholder: "Фамилия Имя Отчество",
+                         regex: "^[А-ЯЁ][а-яё]{0,30} [А-ЯЁ][а-яё]{0,30} [А-ЯЁ][а-яё]{0,30}$",
+                         invalidFeedback: "Неверный формат. Пример \"Иванов Иван Иванович\", допустимы только русские буквы."
+                         )
+
+                @Html.AdaptiveDateInput(
+                         name: nameof(Model.EmployeeData.BirthDate),
+                         label: "Дата рождения",
+                         max: DateTime.Now.AddYears(-18),
+                         isRequired: true
+                         )
+
+                @Html.AdaptiveSelect(
+                         name: nameof(Model.EmployeeData.Gender),
+                         label: "Пол",
+                         value: Model.EmployeeData.Gender,
+                         items: Model.AllGenders.Select(g => new KeyValuePair<string, string>(g, g))
+                         )
+
+                @Html.AdaptiveSelect(
+                         name: nameof(Model.EmployeeData.SegmentId),
+                         label: "Сегмент цеха",
+                         value: Model.EmployeeData.SegmentId.ToString(),
+                         items: Model.AllSegments.Select(s => new KeyValuePair<string, string>(s.Name, s.Id.ToString()))
+                         )
+
+                @Html.AdaptiveDateInput(
+                         name: nameof(Model.EmployeeData.EmploymentDate),
+                         label: "Дата найма",
+                         max: DateTime.Now,
+                         isRequired: true
+                         )
+
+                @Html.AdaptiveTextarea(
+                         name: nameof(Model.EmployeeAccount.Comment),
+                         label: "Комментарий",
+                         value: Model.EmployeeAccount.Comment,
+                         maxLength: 150
+                         )
+            </div>
+            <div class="form-row" style="margin: 0px;">
+                <button class="btn btn-primary ml-auto save-button" disabled type="submit">Сохранить</button>
+            </div>
+        </form>
+    </main>
+    <footer>
+        
+    </footer>
+</div>

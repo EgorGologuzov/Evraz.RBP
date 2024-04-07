@@ -1,0 +1,64 @@
+:root {
+    --orange: #ed7817;
+    --orange-dark: #c26111;
+    --yellow: #fab82e;
+    --red: #e52314;
+}
+
+
+.btn-primary {
+    background-color: #ed7817;
+    border-color: #ed7817;
+}
+
+.btn-primary:hover {
+    background-color: #c26111;
+    border-color: #c26111;
+}
+
+.btn-primary:focus, .btn-primary.focus {
+    box-shadow: none;
+}
+
+.btn-primary.disabled, .btn-primary:disabled {
+    background-color: #c26111;
+    border-color: #c26111;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+    background-color: #c26111;
+    border-color: #c26111;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: none;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #ed7817;
+}
+
+input[type="checkbox"] {
+    accent-color: #ed7817;
+}
+
+.btn-light {
+    color: #212529;
+    background-color: #fff;
+    border-color: #fff;
+}
+
+.btn-link:link, .btn-link:visited, .btn-link:hover, .btn-link:active {
+    text-decoration: none;
+}
+
+.card:hover {
+    border-color: #ed7817;
+}
+
+.custom-select:focus {
+    border-color: #ed7817;
+}

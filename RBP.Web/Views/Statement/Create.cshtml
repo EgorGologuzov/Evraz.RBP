@@ -1,0 +1,105 @@
+﻿@using Microsoft.AspNetCore.Html
+@using RBP.Web.Utils
+@using System.Globalization
+@model StatementViewModel
+
+@{
+    var provider = CultureInfo.CreateSpecificCulture("en-US");
+}
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+        <div class="card not-saved-message border-danger mt-0 mb-1" style="display: none;">
+            <div class="card-body text-danger px-3 py-1">
+                <p class="card-text small">Изменения не сохранены</p>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            @Html.ErrorMessage(Model.ErrorMessage)
+        }
+        @if (!string.IsNullOrEmpty(Model.OkMessage))
+        {
+            @Html.OkMessage(Model.OkMessage)
+        }
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        @Html.ListInputForm(
+                 targetInputId: nameof(Model.DefectsJson),
+                 viewKey: "DefectName",
+                 viewValue: "Size",
+                 caption: "Дефекты",
+                 controls: new List<IHtmlContent>()
+                {
+                    Html.AdaptiveSelect(
+                    name: "DefectName",
+                    label: "Дефект",
+                    items: Model.AllDefects.Select(d => KeyValuePair.Create(d.Name, d.Name)),
+                    bootstrapGridModes: "col-sm-12 col-md-6"
+                    ),
+                    Html.AdaptiveTextBox(
+                    name: "Size",
+                    label: "Размер (мм.)",
+                    placeholder: "Размер",
+                    regex: @"^\d{1,}\.{0,1}\d{0,}$",
+                    invalidFeedback: "Некорректный формат",
+                    bootstrapGridModes: "col-sm-12 col-md-6"
+                    ),
+                }
+                )
+        <form class="need-validate py-2" method="post" action="/Statement/Create">
+            <div class="form-row">
+                @Html.HiddenInput(
+                         name: nameof(Model.DefectsJson),
+                         value: Model.DefectsJson
+                         )
+
+                @Html.HiddenInput(
+                         name: nameof(Model.Statement.Id),
+                         value: Model.Statement.Id.ToString()
+                         )
+
+                @Html.AdaptiveSelect(
+                         name: nameof(Model.Statement.Type),
+                         label: "Тип",
+                         value: Model.Statement.Type.ToString(),
+                         items: Model.StatementTypesNames.Select(t => KeyValuePair.Create(t.Value, ((int)t.Key).ToString()))
+                         )
+
+                @Html.AdaptiveSelect(
+                         name: nameof(Model.ProductId),
+                         label: "Продукт",
+                         value: Model.ProductId.ToString(),
+                         items: Model.AllProducts.Select(p => KeyValuePair.Create(p.Name, p.Id.ToString()))
+                         )
+
+                @Html.AdaptiveTextBox(
+                         name: nameof(Model.Statement.Weight),
+                         label: "Вес (кг.)",
+                         regex: @"^\d{1,}$",
+                         invalidFeedback: "Некорректный формат"
+                         )
+
+                @Html.AdaptiveSelect(
+                         name: nameof(Model.SegmentId),
+                         label: "Место формирования",
+                         value: Model.SegmentId.ToString(),
+                         items: Model.AllSegments.Select(p => KeyValuePair.Create(p.Name, p.Id.ToString()))
+                         )
+
+                @Html.AdaptiveTextarea(
+                         name: nameof(Model.Statement.Comment),
+                         label: "Комментарий",
+                         value: Model.Statement.Comment,
+                         maxLength: 150
+                         )
+            </div>
+            <div class="form-row" style="margin: 0px;">
+                <button class="btn btn-primary ml-auto save-button" disabled type="submit">Сохранить</button>
+            </div>
+        </form>
+    </main>
+    <footer>
+    </footer>
+</div>

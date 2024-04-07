@@ -1,0 +1,40 @@
+﻿@using RBP.Web.Utils
+@model ProductViewModel
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            @Html.ErrorMessage(Model.ErrorMessage)
+        }
+        @if (!string.IsNullOrEmpty(Model.OkMessage))
+        {
+            @Html.OkMessage(Model.OkMessage)
+        }
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        @if (string.IsNullOrEmpty(Model.ErrorMessage) && string.IsNullOrEmpty(Model.OkMessage))
+        {
+            <div class='card error-message border-danger mt-0 mb-1'>
+                <div class='card-body text-danger px-3 py-1'>
+                    <p class='card-text'>
+                        Вы действительно хотите удалить продукт "@Model.Product.Name"?
+                    </p>
+                </div>
+            </div>
+        }
+    </main>
+    <footer>
+        @if (string.IsNullOrEmpty(Model.ErrorMessage) && string.IsNullOrEmpty(Model.OkMessage))
+        {
+            <a class="btn btn-primary btn-block" href="/Product/Edit?Id=@Model.Product.Id">Нет, отмена</a>
+            <a class="btn btn-danger btn-block" href="/Product/DeleteFinnaly?Id=@Model.Product.Id">Да, удалить</a>
+        }
+        else
+        {
+            <a class="btn btn-primary btn-block" href="/Product/Index">К справочнику</a>
+        }
+    </footer>
+</div>
+

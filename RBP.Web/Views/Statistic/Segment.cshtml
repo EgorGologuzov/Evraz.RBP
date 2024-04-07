@@ -1,0 +1,150 @@
+﻿@using RBP.Web.Utils
+@using System.Collections.Generic
+@using System.Globalization
+@model SegmentStatisticViewModel
+
+@{
+    var format = "dd MMM";
+    var provider = CultureInfo.CreateSpecificCulture("ru-RU");
+    var nowStr = Model.End.Value.ToString(format, provider);
+    var days = (Model.End - Model.Start).Value.Days;
+}
+
+<div class="w-100 h-100 p-2" style="display: flex; flex-direction: column;">
+    <header>
+        <h3>@Model.PageTitle</h3>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            @Html.ErrorMessage(Model.ErrorMessage)
+        }
+        @if (!string.IsNullOrEmpty(Model.OkMessage))
+        {
+            @Html.OkMessage(Model.OkMessage)
+        }
+    </header>
+    <main style="flex: 1; overflow-y: visible; overflow-x: hidden;">
+        <form class="need-validate py-2" method="post" action="/Statistic/Segment">
+            <div class="form-row">
+                @Html.HiddenInput(
+                         name: nameof(Model.Statistic.SegmentId),
+                         value: Model.Statistic.SegmentId.ToString()
+                         )
+
+                @Html.AdaptiveDateInput(
+                         name: nameof(Model.Start),
+                         value: Model.Start,
+                         label: "От",
+                         max: DateTime.Now,
+                         bootstrapGridModes: "col-6",
+                         isRequired: true
+                         )
+
+                @Html.AdaptiveDateInput(
+                         name: nameof(Model.End),
+                         label: "До",
+                         value: Model.End,
+                         max: DateTime.Now,
+                         bootstrapGridModes: "col-6",
+                         isRequired: true
+                         )
+            </div>
+            <div class="form-row" style="margin: 0px;">
+                <button class="btn btn-primary ml-auto save-button" disabled type="submit">Загрузить</button>
+            </div>
+        </form>
+        <h5>@Model.Segment.Name</h5>
+        <div class="row m-0 pt-2">
+            <div class="p-0 mb-1 col-12 col-lg-6">
+                <div class="card h-100 mr-lg-1">
+                    <a class="h-100" style="color: black; text-decoration: none;">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title m-0 mb-2">@string.Format("На хранениии (на {0})", nowStr)</h5>
+                                @Html.ChartDoughnut(
+                                         name: nameof(Model.Statistic.ProductsInStorageNow),
+                                         data: Model.Statistic.ProductsInStorageNow
+                                         )
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="p-0 mb-1 col-12 col-lg-6">
+                <div class="card h-100 mr-lg-1">
+                    <a class="h-100" style="color: black; text-decoration: none;">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Принято (перирод {0} дней)", days)</h5>
+                                @Html.ChartDoughnut(
+                                         name: nameof(Model.Statistic.AcceptedProductsForPeriod),
+                                         data: Model.Statistic.AcceptedProductsForPeriod
+                                         )
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="p-0 mb-1 col-12 col-lg-6">
+                <div class="card h-100 mr-lg-1">
+                    <a class="h-100" style="color: black; text-decoration: none;">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Отгружено (перирод {0} дней)", days)</h5>
+                                @Html.ChartDoughnut(
+                                         name: nameof(Model.Statistic.ShippedProductsForPeriod),
+                                         data: Model.Statistic.ShippedProductsForPeriod
+                                         )
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="p-0 mb-1 col-12 col-lg-6">
+                <div class="card h-100 mr-lg-1">
+                    <a class="h-100" style="color: black; text-decoration: none;">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title m-0 mb-2">@string.Format("На хранении с деффектами (на {0})", nowStr)</h5>
+                                @Html.ChartDoughnut(
+                                    name: nameof(Model.Statistic.DefectedProductsInStorageNow),
+                                    data: Model.Statistic.DefectedProductsInStorageNow
+                                )
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="p-0 mb-1 col-12 col-lg-6">
+                <div class="card h-100 mr-lg-1">
+                    <a class="h-100" style="color: black; text-decoration: none;">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Динамика отгрузки (перирод {0} дней)", days)</h5>
+                                @Html.ChartOneLine(
+                                    data: Model.Statistic.ShippedWeightDynamic.Select(kvp => KeyValuePair.Create(kvp.Key.ToString(format, provider), kvp.Value))
+                                )
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="p-0 mb-1 col-12 col-lg-6">
+                <div class="card h-100 mr-lg-1">
+                    <a class="h-100" style="color: black; text-decoration: none;">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Динамика приемки (перирод {0} дней)", days)</h5>
+                                @Html.ChartOneLine(
+                                    data: Model.Statistic.AcceptedWeightDynamic.Select(kvp => KeyValuePair.Create(kvp.Key.ToString(format, provider), kvp.Value))
+                                )
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <a class="btn btn-primary btn-block" href="/Statement/List?SegmentId=@Model.Segment.Id">Ведомости</a>
+    </footer>
+</div>

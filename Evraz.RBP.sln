@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RBP.Web", "RBP.Web\RBP.Web.csproj", "{882871A0-2B74-449C-B71F-9E977D12D98B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RBP.Services", "RBP.Services\RBP.Services.csproj", "{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{882871A0-2B74-449C-B71F-9E977D12D98B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{882871A0-2B74-449C-B71F-9E977D12D98B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{882871A0-2B74-449C-B71F-9E977D12D98B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{882871A0-2B74-449C-B71F-9E977D12D98B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AA538F16-7E92-4F2C-A9E8-139AFCF3F458}
+	EndGlobalSection
+EndGlobal
