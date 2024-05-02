@@ -1,11 +1,12 @@
-﻿using RBP.Web.Properties;
+﻿using RBP.Services.Dto;
+using RBP.Web.Properties;
 
 namespace RBP.Web.Models
 {
     public class ClientBasedViewModel
     {
         public string PageTitle { get; set; }
-        public AccountData Client { get; set; }
+        public AccountReturnDto Client { get; set; }
         public string? ErrorMessage { get; set; }
         public string? OkMessage { get; set; }
 
@@ -22,7 +23,7 @@ namespace RBP.Web.Models
         public string ClientRoleTitle => Roles.Config[Client.Role].Title;
         public IDictionary<string, string> MenuOptions => Roles.Config[Client.Role].Functions;
 
-        public ClientBasedViewModel(string pageTitle, AccountData client)
+        public ClientBasedViewModel(string pageTitle, AccountReturnDto client)
         {
             PageTitle = pageTitle;
             Client = client;

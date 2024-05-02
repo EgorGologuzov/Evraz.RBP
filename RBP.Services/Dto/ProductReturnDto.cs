@@ -1,6 +1,6 @@
-﻿namespace RBP.Web.Dto
+﻿namespace RBP.Services.Dto
 {
-    public class ProductUpdateDto
+    public class ProductReturnDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

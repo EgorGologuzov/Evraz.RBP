@@ -1,20 +1,20 @@
-﻿using RBP.Web.Dto;
-using RBP.Web.Models;
+﻿using RBP.Services.Dto;
+using RBP.Services.Models;
 
 namespace RBP.Web.Services.Interfaces
 {
     public interface IHandbookService : IApiService
     {
-        Task<HandbookEntityData?> Get(int id, string handbook);
-        Task<IList<HandbookData>> GetAll();
-        Task<IList<HandbookEntityData>> GetAll(string handbookName);
-        Task<HandbookData> GetSegmentsHandbook();
-        Task<IList<HandbookEntityData>> GetAllSegments();
-        Task<IList<HandbookEntityData>> GetAllSteels();
-        Task<IList<HandbookEntityData>> GetAllProfiles();
-        Task<IList<HandbookEntityData>> GetAllDefects();
-        Task<HandbookEntityData> Create(HandbookEntityCreateDto data);
-        Task<HandbookEntityData> Update(HandbookEntityUpdateDto data);
-        Task<HandbookEntityData> Delete(int id, string handbook);
+        Task<HandbookEntityReturnDto?> Get(int id, string handbook);
+        Task<IList<Handbook>> GetAll();
+        Task<IList<HandbookEntityReturnDto>> GetAll(string handbookName);
+        Task<Handbook> GetSegmentsHandbook();
+        Task<IList<HandbookEntityReturnDto>> GetAllSegments();
+        Task<IList<HandbookEntityReturnDto>> GetAllSteels();
+        Task<IList<HandbookEntityReturnDto>> GetAllProfiles();
+        Task<IList<HandbookEntityReturnDto>> GetAllDefects();
+        Task<HandbookEntityReturnDto> Create(HandbookEntityCreateDto data);
+        Task<HandbookEntityReturnDto> Update(HandbookEntityUpdateDto data);
+        Task<HandbookEntityReturnDto> Delete(int id, string handbook);
     }
 }

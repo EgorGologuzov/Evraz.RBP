@@ -1,10 +1,10 @@
-﻿using RBP.Web.Models;
+﻿using RBP.Services.Models;
 
 namespace RBP.Web.Properties
 {
     public class Handbooks
     {
-        public static readonly List<HandbookData> Config = new()
+        public static readonly List<Handbook> Config = new()
         {
             new()
             {

@@ -1,15 +1,15 @@
-﻿using RBP.Services;
-using RBP.Services.Utils;
-using RBP.Web.Dto;
-using RBP.Web.Models;
+﻿using RBP.Services.Utils;
+using RBP.Services.Dto;
+using RBP.Services.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
+using RBP.Services.Static;
 
 namespace RBP.Web.Services
 {
     public class AccountService : ApiServiceBase, IAccountService
     {
-        public static List<AccountData> Accounts = new()
+        public static List<AccountReturnDto> Accounts = new()
         {
             new()
             {
@@ -67,12 +67,12 @@ namespace RBP.Web.Services
             _logger = logger;
         }
 
-        public async Task<AccountData?> Get(Guid id)
+        public async Task<AccountReturnDto?> Get(Guid id)
         {
             return Accounts.Find(a => a.Id == id);
         }
 
-        public async Task<IList<AccountData>> Find(string? name, string role)
+        public async Task<IList<AccountReturnDto>> Find(string? name, string role)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -82,14 +82,14 @@ namespace RBP.Web.Services
             return Accounts.Where(a => a.Name.Contains(name) && a.Role == role).ToList();
         }
 
-        public async Task<IList<AccountData>> GetAll(string role)
+        public async Task<IList<AccountReturnDto>> GetAll(string role)
         {
             return Accounts.Where(a => a.Role == role).ToList();
         }
 
-        public async Task<AccountData> CreateEmployee(EmployeeCreateDto data)
+        public async Task<AccountReturnDto> CreateEmployee(EmployeeCreateDto data)
         {
-            AccountData? account = Accounts.Find(a => a.Phone == data.Phone);
+            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
 
             if (account is not null)
             {
@@ -101,9 +101,9 @@ namespace RBP.Web.Services
             return Accounts[0];
         }
 
-        public async Task<AccountData> UpdateEmployee(EmployeeUpdateDto data)
+        public async Task<AccountReturnDto> UpdateEmployee(EmployeeUpdateDto data)
         {
-            AccountData? account = Accounts.Find(a => a.Phone == data.Phone);
+            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
 
             if (account is null)
             {
@@ -115,9 +115,9 @@ namespace RBP.Web.Services
             return Accounts.Find(a => a.Id == data.Id);
         }
 
-        public async Task<AccountData> CreateAdmin(AdminCreateDto data)
+        public async Task<AccountReturnDto> CreateAdmin(AdminCreateDto data)
         {
-            AccountData? account = Accounts.Find(a => a.Phone == data.Phone);
+            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
 
             if (account is not null)
             {
@@ -129,9 +129,9 @@ namespace RBP.Web.Services
             return Accounts[0];
         }
 
-        public async Task<AccountData> UpdateAdmin(AdminUpdateDto data)
+        public async Task<AccountReturnDto> UpdateAdmin(AdminUpdateDto data)
         {
-            AccountData? account = Accounts.Find(a => a.Phone == data.Phone);
+            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
 
             if (account is null)
             {

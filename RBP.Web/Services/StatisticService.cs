@@ -1,11 +1,11 @@
-﻿using RBP.Web.Models;
+﻿using RBP.Services.Models;
 using RBP.Web.Services.Interfaces;
 
 namespace RBP.Web.Services
 {
     public class StatisticService : ApiServiceBase, IStatisticService
     {
-        public static readonly List<SegmentStatisticData> Statistic = new()
+        public static readonly List<SegmentStatistic> Statistic = new()
         {
             new()
             {
@@ -75,12 +75,12 @@ namespace RBP.Web.Services
             }
         };
 
-        public async Task<SegmentStatisticData> GetSegmentStatistic(int segmentId, DateTime start, DateTime end)
+        public async Task<SegmentStatistic> GetSegmentStatistic(int segmentId, DateTime start, DateTime end)
         {
             return Statistic.Find(s => s.SegmentId == segmentId) ?? Statistic[0];
         }
 
-        public async Task<SegmentStatisticData> GetAllWorkshopStatistic(DateTime start, DateTime end)
+        public async Task<SegmentStatistic> GetAllWorkshopStatistic(DateTime start, DateTime end)
         {
             return Statistic[0];
         }

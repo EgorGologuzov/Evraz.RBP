@@ -1,21 +1,21 @@
 ﻿using RBP.Services.Utils;
-using RBP.Services;
-using RBP.Web.Models;
+using RBP.Services.Models;
 using RBP.Web.Services.Interfaces;
-using RBP.Web.Dto;
+using RBP.Services.Dto;
+using RBP.Services.Static;
 
 namespace RBP.Web.Services
 {
     public class StatementService : ApiServiceBase, IStatementService
     {
-        public static readonly List<StatementData> Statements = new()
+        public static readonly List<StatementReturnDto> Statements = new()
         {
             new()
             {
                 Id = Guid.NewGuid(),
                 Date = DateTime.Now,
                 Weight = 1340,
-                Product = new ProductData
+                Product = new ProductReturnDto
                 {
                     Id = Guid.NewGuid(),
                     Name = "КР70, 9 м.",
@@ -24,7 +24,7 @@ namespace RBP.Web.Services
                     PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 4121-76\"},{\"Key\":\"Длина\",\"Value\":\"12 м.\"}]",
                     Comment = "Крановый рельс. Применяется при прокладке подкрановых путей, необходимых для работы подъёмных кранов."
                 },
-                Responsible = new AccountData
+                Responsible = new AccountReturnDto
                 {
                     Id = Guid.NewGuid(),
                     Phone = "1111111111",
@@ -41,12 +41,12 @@ namespace RBP.Web.Services
                         EmploymentDate = DateTime.Now - TimeSpan.FromDays(365 * 10)
                     }.ToJson()
                 },
-                Segment = new HandbookEntityData
+                Segment = new HandbookEntityReturnDto
                 {
                     Id = 1,
                     Name = "Разгрузка поставок - Приемка"
                 },
-                Defects = new List<StatementDefectData>
+                Defects = new List<StatementDefectReturnDto>
                 {
                     new()
                     {
@@ -65,7 +65,7 @@ namespace RBP.Web.Services
                 Id = Guid.NewGuid(),
                 Date = DateTime.Now,
                 Weight = 300,
-                Product = new ProductData
+                Product = new ProductReturnDto
                 {
                     Id = Guid.NewGuid(),
                     Name = "Т62, 12.5 м.",
@@ -74,7 +74,7 @@ namespace RBP.Web.Services
                     PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 21174-75\"},{\"Key\":\"Длина\",\"Value\":\"12.5 м.\"}]",
                     Comment = "Рельс трамвайный."
                 },
-                Responsible = new AccountData
+                Responsible = new AccountReturnDto
                 {
                     Id = Guid.NewGuid(),
                     Phone = "3333333333",
@@ -90,7 +90,7 @@ namespace RBP.Web.Services
                         EmploymentDate = DateTime.Now - TimeSpan.FromDays(365 * 4)
                     }.ToJson()
                 },
-                Segment = new HandbookEntityData
+                Segment = new HandbookEntityReturnDto
                 {
                     Id = 2,
                     Name = "Разгрузка поставок - Склад"
@@ -105,34 +105,34 @@ namespace RBP.Web.Services
             _logger = logger;
         }
 
-        public async Task<StatementData?> Get(Guid id)
+        public async Task<StatementReturnDto?> Get(Guid id)
         {
             return Statements.Find(s => s.Id == id);
         }
 
-        public async Task<IList<StatementData>> GetAll(Guid employeeId, DateTime date)
+        public async Task<IList<StatementReturnDto>> GetAll(Guid employeeId, DateTime date)
         {
-            return new List<StatementData> { Statements[1] };
+            return new List<StatementReturnDto> { Statements[1] };
         }
 
-        public async Task<IList<StatementData>> GetAll(int segmentId, DateTime date)
+        public async Task<IList<StatementReturnDto>> GetAll(int segmentId, DateTime date)
         {
             return Statements;
         }
 
-        public async Task<IList<StatementData>> GetAll(int segmentId, DateTime date, Guid employeeId)
+        public async Task<IList<StatementReturnDto>> GetAll(int segmentId, DateTime date, Guid employeeId)
         {
-            return new List<StatementData> { Statements[0] };
+            return new List<StatementReturnDto> { Statements[0] };
         }
 
-        public async Task<StatementData> Create(StatementCreateDto data)
+        public async Task<StatementReturnDto> Create(StatementCreateDto data)
         {
             _logger.LogInformation("Создана ведомость: {data}", data.ToJson());
 
             return Statements[0];
         }
 
-        public async Task<StatementData> Delete(Guid id)
+        public async Task<StatementReturnDto> Delete(Guid id)
         {
             return Statements.Find(s => s.Id == id);
         }

@@ -1,5 +1,6 @@
 ﻿using RBP.Services.Models;
 using RBP.Services.Utils;
+using RBP.Services.Dto;
 
 namespace RBP.Web.Models
 {
@@ -8,11 +9,11 @@ namespace RBP.Web.Models
         private EmployeeRoleData _responsible;
         private string _defectsJson;
 
-        public StatementData Statement { get; set; }
-        public IList<ProductData> AllProducts { get; set; }
-        public IList<AccountData> AllEmployees { get; set; }
-        public IList<HandbookEntityData> AllDefects { get; set; }
-        public IList<HandbookEntityData> AllSegments { get; set; }
+        public StatementReturnDto Statement { get; set; }
+        public IList<ProductReturnDto> AllProducts { get; set; }
+        public IList<AccountReturnDto> AllEmployees { get; set; }
+        public IList<HandbookEntityReturnDto> AllDefects { get; set; }
+        public IList<HandbookEntityReturnDto> AllSegments { get; set; }
 
         public IDictionary<StatementType, string> StatementTypesNames => StatementTypesConfig.Names;
         public EmployeeRoleData Responsible => _responsible ??= Statement.Responsible.RoleDataJson.FromJson<EmployeeRoleData>();
@@ -21,7 +22,7 @@ namespace RBP.Web.Models
         public string DefectsJson => _defectsJson ??= Statement.Defects.ToJson();
         public int? SegmentId => Statement.Segment?.Id;
 
-        public StatementViewModel(string pageTitle, AccountData client, StatementData statement, IList<ProductData> allProducts, IList<AccountData> allEmployees, IList<HandbookEntityData> allDefects, IList<HandbookEntityData> allSegments) : base(pageTitle, client)
+        public StatementViewModel(string pageTitle, AccountReturnDto client, StatementReturnDto statement, IList<ProductReturnDto> allProducts, IList<AccountReturnDto> allEmployees, IList<HandbookEntityReturnDto> allDefects, IList<HandbookEntityReturnDto> allSegments) : base(pageTitle, client)
         {
             Statement = statement;
             AllProducts = allProducts;

@@ -1,4 +1,6 @@
-﻿namespace RBP.Web.Models
+﻿using RBP.Services.Dto;
+
+namespace RBP.Web.Models
 {
     public class UpdatePasswordViewModel : ClientBasedViewModel
     {
@@ -6,7 +8,7 @@
         public string NewPassword { get; set; }
         public string PasswordRepeat { get; set; }
 
-        public UpdatePasswordViewModel(string pageTitle, AccountData client) : base(pageTitle, client)
+        public UpdatePasswordViewModel(string pageTitle, AccountReturnDto client) : base(pageTitle, client)
         {
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System.Security.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
+using RBP.Services.Static;
 using RBP.Web.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;

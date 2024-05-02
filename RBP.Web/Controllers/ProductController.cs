@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
 using RBP.Services.Contracts;
 using RBP.Services.Utils;
-using RBP.Web.Dto;
+using RBP.Services.Dto;
 using RBP.Web.Models;
 using RBP.Web.Services;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
+using RBP.Services.Static;
 
 namespace RBP.Web.Controllers
 {
@@ -29,8 +29,8 @@ namespace RBP.Web.Controllers
         [NonAction]
         private async Task<ProductListViewModel> BuildViewModel(string title, string searchRequest)
         {
-            IList<HandbookEntityData> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityData> steels = await _handbookService.GetAllSteels();
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
 
             return new ProductListViewModel(
                 pageTitle: title,
@@ -42,10 +42,10 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<ProductViewModel> BuildViewModel(string title, ProductData data)
+        private async Task<ProductViewModel> BuildViewModel(string title, ProductReturnDto data)
         {
-            IList<HandbookEntityData> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityData> steels = await _handbookService.GetAllSteels();
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
 
             return new ProductViewModel(
                 pageTitle: title,
@@ -59,13 +59,13 @@ namespace RBP.Web.Controllers
         [NonAction]
         private async Task<ProductViewModel> BuildViewModel(string title, ProductUpdateDto data)
         {
-            IList<HandbookEntityData> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityData> steels = await _handbookService.GetAllSteels();
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
 
             return new ProductViewModel(
                 pageTitle: title,
                 client: GetClientData(),
-                product: _mapper.Map<ProductData>(data),
+                product: _mapper.Map<ProductReturnDto>(data),
                 allProfiles: profiles,
                 allSteels: steels
             );
@@ -74,13 +74,13 @@ namespace RBP.Web.Controllers
         [NonAction]
         private async Task<ProductViewModel> BuildViewModel(string title, ProductCreateDto data)
         {
-            IList<HandbookEntityData> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityData> steels = await _handbookService.GetAllSteels();
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
 
             return new ProductViewModel(
                 pageTitle: title,
                 client: GetClientData(),
-                product: _mapper.Map<ProductData>(data),
+                product: _mapper.Map<ProductReturnDto>(data),
                 allProfiles: profiles,
                 allSteels: steels
             );
@@ -105,7 +105,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            ProductData data = new()
+            ProductReturnDto data = new()
             {
                 PropertiesJson = "[]"
             };
@@ -125,7 +125,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                ProductData result = await _productService.Create(data);
+                ProductReturnDto result = await _productService.Create(data);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -145,7 +145,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            ProductData? data = await _productService.Get(id);
+            ProductReturnDto? data = await _productService.Get(id);
 
             if (data is null)
             {
@@ -167,7 +167,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                ProductData result = await _productService.Update(data);
+                ProductReturnDto result = await _productService.Update(data);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -187,11 +187,11 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            ProductData? entity = await _productService.Get(id);
+            ProductReturnDto? entity = await _productService.Get(id);
 
             if (entity is null)
             {
-                ProductViewModel model = await BuildViewModel("Удаление", new ProductData());
+                ProductViewModel model = await BuildViewModel("Удаление", new ProductReturnDto());
                 model.ErrorMessage = "Продукт не существует";
 
                 return View(model);
@@ -209,7 +209,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                ProductData result = await _productService.Delete(id);
+                ProductReturnDto result = await _productService.Delete(id);
                 ProductViewModel model = await BuildViewModel("Удаление", result);
                 model.OkMessage = "Продукт удален";
 
@@ -217,7 +217,7 @@ namespace RBP.Web.Controllers
             }
             catch (NotOkResponseException ex)
             {
-                ProductViewModel model = await BuildViewModel("Удаление", new ProductData());
+                ProductViewModel model = await BuildViewModel("Удаление", new ProductReturnDto());
                 model.ErrorMessage = ex.Message;
 
                 return View(nameof(Delete), model);

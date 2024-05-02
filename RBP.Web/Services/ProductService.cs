@@ -1,7 +1,6 @@
 ﻿using RBP.Services.Models;
 using RBP.Services.Utils;
-using RBP.Web.Dto;
-using RBP.Web.Models;
+using RBP.Services.Dto;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
 
@@ -9,7 +8,7 @@ namespace RBP.Web.Services
 {
     public class ProductService : ApiServiceBase, IProductService
     {
-        public static readonly List<ProductData> Products = new()
+        public static readonly List<ProductReturnDto> Products = new()
         {
             new()
             {
@@ -47,12 +46,12 @@ namespace RBP.Web.Services
             _logger = logger;
         }
 
-        public async Task<ProductData?> Get(Guid id)
+        public async Task<ProductReturnDto?> Get(Guid id)
         {
             return Products.Find(p => p.Id == id);
         }
 
-        public async Task<IList<ProductData>> Find(string name)
+        public async Task<IList<ProductReturnDto>> Find(string name)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -62,14 +61,14 @@ namespace RBP.Web.Services
             return Products.Where(p => p.Name.Contains(name)).ToList();
         }
 
-        public async Task<IList<ProductData>> GetAll()
+        public async Task<IList<ProductReturnDto>> GetAll()
         {
             return Products;
         }
 
-        public async Task<ProductData> Create(ProductCreateDto data)
+        public async Task<ProductReturnDto> Create(ProductCreateDto data)
         {
-            ProductData? product = Products.Find(p => p.Name == data.Name);
+            ProductReturnDto? product = Products.Find(p => p.Name == data.Name);
 
             if (product is not null)
             {
@@ -81,9 +80,9 @@ namespace RBP.Web.Services
             return Products[0];
         }
 
-        public async Task<ProductData> Update(ProductUpdateDto data)
+        public async Task<ProductReturnDto> Update(ProductUpdateDto data)
         {
-            ProductData? product = Products.Find(p => p.Id == data.Id);
+            ProductReturnDto? product = Products.Find(p => p.Id == data.Id);
 
             if (product is null)
             {
@@ -95,9 +94,9 @@ namespace RBP.Web.Services
             return product;
         }
 
-        public async Task<ProductData> Delete(Guid id)
+        public async Task<ProductReturnDto> Delete(Guid id)
         {
-            ProductData? product = Products.Find(p => p.Id == id);
+            ProductReturnDto? product = Products.Find(p => p.Id == id);
 
             if (product is null)
             {

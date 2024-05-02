@@ -1,6 +1,6 @@
-﻿namespace RBP.Web.Models
+﻿namespace RBP.Services.Dto
 {
-    public class AccountData
+    public class AccountReturnDto
     {
         public Guid Id { get; set; }
         public string Phone { get; set; }

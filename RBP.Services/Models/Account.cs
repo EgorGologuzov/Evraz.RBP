@@ -2,12 +2,14 @@
 {
     public class Account
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        public Guid Id { get; set; }
+        public string Phone { get; set; }
         public string PasswordHash { get; set; }
+        public string Name { get; set; }
         public string Role { get; set; }
-        public string RoleDataClassName { get; set; }
         public string RoleDataJson { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTime CreationTime { get; set; }
+        public string Comment { get; set; }
+        public bool IsActive { get; set; }
     }
 }

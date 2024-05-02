@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
-using RBP.Web.Dto;
+using RBP.Services.Dto;
+using RBP.Services.Models;
+using RBP.Services.Static;
 using RBP.Web.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
@@ -21,7 +22,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<HandbookEntityViewModel> BuildViewModel(string title, string handbookName, HandbookEntityData entity)
+        private async Task<HandbookEntityViewModel> BuildViewModel(string title, string handbookName, HandbookEntityReturnDto entity)
         {
             return new HandbookEntityViewModel(
                 pageTitle: title,
@@ -32,9 +33,9 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<HandbookEntityListViewModel> BuildViewModel(string handbookName, IList<HandbookEntityData> entities)
+        private async Task<HandbookEntityListViewModel> BuildViewModel(string handbookName, IList<HandbookEntityReturnDto> entities)
         {
-            HandbookData handbook = (await _handbookService.GetAll()).First(h => h.Name == handbookName);
+            Handbook handbook = (await _handbookService.GetAll()).First(h => h.Name == handbookName);
 
             return new HandbookEntityListViewModel(
                 pageTitle: handbook.Title,
@@ -45,7 +46,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<HandbookListViewModel> BuildViewModel(string title, IList<HandbookData> handbooks)
+        private async Task<HandbookListViewModel> BuildViewModel(string title, IList<Handbook> handbooks)
         {
             return new HandbookListViewModel(title, GetClientData(), handbooks);
         }
@@ -81,7 +82,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            HandbookEntityViewModel model = await BuildViewModel("Создание", handbookName, new HandbookEntityData());
+            HandbookEntityViewModel model = await BuildViewModel("Создание", handbookName, new HandbookEntityReturnDto());
 
             return View(model);
         }
@@ -96,13 +97,13 @@ namespace RBP.Web.Controllers
 
             try
             {
-                HandbookEntityData result = await _handbookService.Create(data);
+                HandbookEntityReturnDto result = await _handbookService.Create(data);
 
                 return RedirectToAction(nameof(List), new { data.HandbookName });
             }
             catch (NotOkResponseException ex)
             {
-                HandbookEntityData result = _mapper.Map<HandbookEntityData>(data);
+                HandbookEntityReturnDto result = _mapper.Map<HandbookEntityReturnDto>(data);
                 HandbookEntityViewModel model = await BuildViewModel("Создание", data.HandbookName, result);
                 model.ErrorMessage = ex.Message;
 
@@ -117,7 +118,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            HandbookEntityData? entity = await _handbookService.Get(id, handbookName);
+            HandbookEntityReturnDto? entity = await _handbookService.Get(id, handbookName);
 
             if (entity is null)
             {
@@ -137,13 +138,13 @@ namespace RBP.Web.Controllers
 
             try
             {
-                HandbookEntityData result = await _handbookService.Update(data);
+                HandbookEntityReturnDto result = await _handbookService.Update(data);
 
                 return RedirectToAction(nameof(List), new { data.HandbookName });
             }
             catch (NotOkResponseException ex)
             {
-                HandbookEntityData result = _mapper.Map<HandbookEntityData>(data);
+                HandbookEntityReturnDto result = _mapper.Map<HandbookEntityReturnDto>(data);
                 HandbookEntityViewModel model = await BuildViewModel("Редактирование", data.HandbookName, result);
                 model.ErrorMessage = ex.Message;
 
@@ -158,11 +159,11 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            HandbookEntityData? entity = await _handbookService.Get(id, handbookName);
+            HandbookEntityReturnDto? entity = await _handbookService.Get(id, handbookName);
 
             if (entity is null)
             {
-                HandbookEntityViewModel model = await BuildViewModel("Удаление", handbookName, new HandbookEntityData());
+                HandbookEntityViewModel model = await BuildViewModel("Удаление", handbookName, new HandbookEntityReturnDto());
                 model.ErrorMessage = "Элемент не существует";
 
                 return View(model);
@@ -180,7 +181,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                HandbookEntityData result = await _handbookService.Delete(id, handbookName);
+                HandbookEntityReturnDto result = await _handbookService.Delete(id, handbookName);
                 HandbookEntityViewModel model = await BuildViewModel("Удаление", handbookName, result);
                 model.OkMessage = "Элемент удален из справочника";
 
@@ -188,7 +189,7 @@ namespace RBP.Web.Controllers
             }
             catch (NotOkResponseException ex)
             {
-                HandbookEntityViewModel model = await BuildViewModel("Удаление", handbookName, new HandbookEntityData());
+                HandbookEntityViewModel model = await BuildViewModel("Удаление", handbookName, new HandbookEntityReturnDto());
                 model.ErrorMessage = ex.Message;
 
                 return View(nameof(Delete), model);

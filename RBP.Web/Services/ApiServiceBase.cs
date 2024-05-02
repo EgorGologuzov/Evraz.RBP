@@ -1,4 +1,4 @@
-﻿using RBP.Web.Models;
+﻿using RBP.Services.Models;
 using RBP.Web.Services.Interfaces;
 
 namespace RBP.Web.Services

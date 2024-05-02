@@ -1,23 +1,25 @@
-﻿namespace RBP.Web.Models
+﻿using RBP.Services.Dto;
+
+namespace RBP.Web.Models
 {
     public class ProductViewModel : ClientBasedViewModel
     {
         public const string PropertyViewKey = "Key";
         public const string PropertyViewValue = "Value";
 
-        public ProductData Product { get; set; }
-        public IList<HandbookEntityData> AllProfiles { get; set; }
-        public IList<HandbookEntityData> AllSteels { get; set; }
+        public ProductReturnDto Product { get; set; }
+        public IList<HandbookEntityReturnDto> AllProfiles { get; set; }
+        public IList<HandbookEntityReturnDto> AllSteels { get; set; }
 
-        public HandbookEntityData Profile => AllProfiles.First(p => p.Id == Product.ProfileId);
-        public HandbookEntityData Steel => AllSteels.First(s => s.Id == Product.SteelId);
+        public HandbookEntityReturnDto Profile => AllProfiles.First(p => p.Id == Product.ProfileId);
+        public HandbookEntityReturnDto Steel => AllSteels.First(s => s.Id == Product.SteelId);
 
         public ProductViewModel(
             string pageTitle,
-            AccountData client,
-            ProductData product,
-            IList<HandbookEntityData> allProfiles,
-            IList<HandbookEntityData> allSteels) : base(pageTitle, client)
+            AccountReturnDto client,
+            ProductReturnDto product,
+            IList<HandbookEntityReturnDto> allProfiles,
+            IList<HandbookEntityReturnDto> allSteels) : base(pageTitle, client)
         {
             Product = product;
             AllProfiles = allProfiles;

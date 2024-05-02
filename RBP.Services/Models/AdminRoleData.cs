@@ -1,4 +1,4 @@
-﻿namespace RBP.Web.Models
+﻿namespace RBP.Services.Models
 {
     public class AdminRoleData
     {

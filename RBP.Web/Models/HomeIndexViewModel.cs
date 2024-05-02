@@ -1,8 +1,10 @@
-﻿namespace RBP.Web.Models
+﻿using RBP.Services.Dto;
+
+namespace RBP.Web.Models
 {
     public class HomeIndexViewModel : ClientBasedViewModel
     {
-        public HomeIndexViewModel(string pageTitle, AccountData client) : base(pageTitle, client)
+        public HomeIndexViewModel(string pageTitle, AccountReturnDto client) : base(pageTitle, client)
         {
         }
 

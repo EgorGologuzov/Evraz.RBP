@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
 using RBP.Services.Utils;
-using RBP.Web.Dto;
+using RBP.Services.Dto;
 using RBP.Web.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
+using RBP.Services.Static;
 
 namespace RBP.Web.Controllers
 {
@@ -61,7 +61,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                IList<StatementData> data = ClientInRole(ClientRoles.Employee)
+                IList<StatementReturnDto> data = ClientInRole(ClientRoles.Employee)
                     ? await _statementService.GetAll(segmentId, date.Value, GetClientData().Id)
                     : await _statementService.GetAll(segmentId, date.Value);
                 StatementListViewModel model = await BuildViewModel(data, segmentId, date.Value);
@@ -86,7 +86,7 @@ namespace RBP.Web.Controllers
             }
 
             date ??= DateTime.Now;
-            AccountData? employee = await _accountService.Get(employeeId);
+            AccountReturnDto? employee = await _accountService.Get(employeeId);
 
             if (employee is null)
             {
@@ -95,7 +95,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                IList<StatementData> data = await _statementService.GetAll(employeeId, date.Value);
+                IList<StatementReturnDto> data = await _statementService.GetAll(employeeId, date.Value);
                 StatementListViewModel model = await BuildViewModel(data, employee, date.Value);
                 _logger.LogInformation("Запрошен список ведомостей сотрдуника: {id}, {date}", employee.Id, date);
 
@@ -119,9 +119,9 @@ namespace RBP.Web.Controllers
 
             StatementViewModel model = await BuildViewModel(
                 "Создание",
-                new StatementData
+                new StatementReturnDto
                 {
-                    Segment = segmentId is null ? null : new HandbookEntityData { Id = segmentId.Value }
+                    Segment = segmentId is null ? null : new HandbookEntityReturnDto { Id = segmentId.Value }
                 }
             );
 
@@ -138,7 +138,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                StatementData result = await _statementService.Create(data);
+                StatementReturnDto result = await _statementService.Create(data);
 
                 return RedirectToAction(nameof(List), new { data.SegmentId, Date = DateTime.Now });
             }
@@ -158,7 +158,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            StatementData? data = await _statementService.Get(id);
+            StatementReturnDto? data = await _statementService.Get(id);
 
             if (data is null)
             {
@@ -177,7 +177,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            StatementData? entity = await _statementService.Get(id);
+            StatementReturnDto? entity = await _statementService.Get(id);
 
             if (entity is null)
             {
@@ -196,7 +196,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                StatementData result = await _statementService.Delete(id);
+                StatementReturnDto result = await _statementService.Delete(id);
                 StatementViewModel model = await BuildViewModel("Удаление", result);
                 model.OkMessage = "Ведомость удалена";
 
@@ -204,7 +204,7 @@ namespace RBP.Web.Controllers
             }
             catch (NotOkResponseException ex)
             {
-                StatementViewModel model = await BuildViewModel("Удаление", new StatementData());
+                StatementViewModel model = await BuildViewModel("Удаление", new StatementReturnDto());
                 model.ErrorMessage = ex.Message;
 
                 return View(nameof(Delete), model);
@@ -223,9 +223,9 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<StatementListViewModel> BuildViewModel(IList<StatementData> data, int segmentId, DateTime date)
+        private async Task<StatementListViewModel> BuildViewModel(IList<StatementReturnDto> data, int segmentId, DateTime date)
         {
-            HandbookEntityData segment = (await _handbookService.GetAllSegments()).First(s => s.Id == segmentId);
+            HandbookEntityReturnDto segment = (await _handbookService.GetAllSegments()).First(s => s.Id == segmentId);
 
             return new StatementListViewModel(
                 pageTitle: segment.Name,
@@ -237,7 +237,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<StatementListViewModel> BuildViewModel(IList<StatementData> data, AccountData employee, DateTime date)
+        private async Task<StatementListViewModel> BuildViewModel(IList<StatementReturnDto> data, AccountReturnDto employee, DateTime date)
         {
             return new StatementListViewModel(
                 pageTitle: employee.Name,
@@ -249,12 +249,12 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<StatementViewModel> BuildViewModel(string title, StatementData data)
+        private async Task<StatementViewModel> BuildViewModel(string title, StatementReturnDto data)
         {
-            Task<IList<ProductData>> allProducts = _productService.GetAll();
-            Task<IList<AccountData>> allEmployees = _accountService.GetAll(ClientRoles.Employee);
-            Task<IList<HandbookEntityData>> allDefects = _handbookService.GetAllDefects();
-            Task<IList<HandbookEntityData>> allSegments = _handbookService.GetAllSegments();
+            Task<IList<ProductReturnDto>> allProducts = _productService.GetAll();
+            Task<IList<AccountReturnDto>> allEmployees = _accountService.GetAll(ClientRoles.Employee);
+            Task<IList<HandbookEntityReturnDto>> allDefects = _handbookService.GetAllDefects();
+            Task<IList<HandbookEntityReturnDto>> allSegments = _handbookService.GetAllSegments();
 
             await Task.WhenAll(allProducts, allEmployees, allDefects, allSegments);
 
@@ -271,17 +271,17 @@ namespace RBP.Web.Controllers
         [NonAction]
         private async Task<StatementViewModel> BuildViewModel(string title, StatementCreateDto data)
         {
-            Task<IList<ProductData>> allProducts = _productService.GetAll();
-            Task<IList<AccountData>> allEmployees = _accountService.GetAll(ClientRoles.Employee);
-            Task<IList<HandbookEntityData>> allDefects = _handbookService.GetAllDefects();
-            Task<IList<HandbookEntityData>> allSegments = _handbookService.GetAllSegments();
+            Task<IList<ProductReturnDto>> allProducts = _productService.GetAll();
+            Task<IList<AccountReturnDto>> allEmployees = _accountService.GetAll(ClientRoles.Employee);
+            Task<IList<HandbookEntityReturnDto>> allDefects = _handbookService.GetAllDefects();
+            Task<IList<HandbookEntityReturnDto>> allSegments = _handbookService.GetAllSegments();
 
             await Task.WhenAll(allProducts, allEmployees, allDefects, allSegments);
 
             return new StatementViewModel(
                 pageTitle: title,
                 client: GetClientData(),
-                statement: _mapper.Map<StatementData>(data),
+                statement: _mapper.Map<StatementReturnDto>(data),
                 allProducts: allProducts.Result,
                 allEmployees: allEmployees.Result,
                 allDefects: allDefects.Result,

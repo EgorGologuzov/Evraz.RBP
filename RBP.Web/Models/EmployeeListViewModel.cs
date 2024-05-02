@@ -1,4 +1,4 @@
-﻿using RBP.Web.Dto;
+﻿using RBP.Services.Dto;
 
 namespace RBP.Web.Models
 {
@@ -7,7 +7,7 @@ namespace RBP.Web.Models
         public string? SearchRequest { get; set; }
         public IList<EmployeeViewModel> Employees { get; set; }
 
-        public EmployeeListViewModel(string pageTitle, AccountData client) : base(pageTitle, client)
+        public EmployeeListViewModel(string pageTitle, AccountReturnDto client) : base(pageTitle, client)
         {
         }
     }

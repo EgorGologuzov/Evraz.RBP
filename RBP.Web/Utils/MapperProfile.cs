@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using RBP.Web.Dto;
-using RBP.Web.Models;
+using RBP.Services.Dto;
+using RBP.Services.Models;
 
 namespace RBP.Web.Utils
 {
@@ -8,18 +8,18 @@ namespace RBP.Web.Utils
     {
         public MapperProfile()
         {
-            CreateMap<EmployeeCreateDto, AccountData>().ReverseMap();
+            CreateMap<EmployeeCreateDto, AccountReturnDto>().ReverseMap();
             CreateMap<EmployeeCreateDto, EmployeeRoleData>().ReverseMap();
-            CreateMap<EmployeeUpdateDto, AccountData>().ReverseMap();
+            CreateMap<EmployeeUpdateDto, AccountReturnDto>().ReverseMap();
             CreateMap<EmployeeUpdateDto, EmployeeRoleData>().ReverseMap();
-            CreateMap<HandbookEntityUpdateDto, HandbookEntityData>().ReverseMap();
-            CreateMap<HandbookEntityCreateDto, HandbookEntityData>().ReverseMap();
-            CreateMap<ProductUpdateDto, ProductData>().ReverseMap();
-            CreateMap<ProductCreateDto, ProductData>().ReverseMap();
-            CreateMap<StatementCreateDto, StatementData>().ReverseMap();
-            CreateMap<AdminCreateDto, AccountData>().ReverseMap();
+            CreateMap<HandbookEntityUpdateDto, HandbookEntityReturnDto>().ReverseMap();
+            CreateMap<HandbookEntityCreateDto, HandbookEntityReturnDto>().ReverseMap();
+            CreateMap<ProductUpdateDto, ProductReturnDto>().ReverseMap();
+            CreateMap<ProductCreateDto, ProductReturnDto>().ReverseMap();
+            CreateMap<StatementCreateDto, StatementReturnDto>().ReverseMap();
+            CreateMap<AdminCreateDto, AccountReturnDto>().ReverseMap();
             CreateMap<AdminCreateDto, AdminRoleData>().ReverseMap();
-            CreateMap<AdminUpdateDto, AccountData>().ReverseMap();
+            CreateMap<AdminUpdateDto, AccountReturnDto>().ReverseMap();
             CreateMap<AdminUpdateDto, AdminRoleData>().ReverseMap();
         }
     }

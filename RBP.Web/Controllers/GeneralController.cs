@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using RBP.Services;
 using RBP.Services.Utils;
+using RBP.Services.Dto;
+using RBP.Services.Models;
 using RBP.Web.Models;
 using RBP.Web.Services;
 using RBP.Web.Services.Interfaces;
@@ -18,14 +20,14 @@ namespace RBP.Web.Controllers
         private const string _accountAuthenticationDataSessionKey = "AccountAuthenticationData";
         private const string _loginPagePath = "/Account/Login";
 
-        private AccountData? _accountData;
+        private AccountReturnDto? _accountData;
         private ApiData? _apiData;
         private Func<IActionResult> _unauthorizedAction;
 
         public ApiData? ApiData => GetApiData();
 
         [NonAction]
-        protected AccountData? GetClientData()
+        protected AccountReturnDto? GetClientData()
         {
             if (_accountData is not null)
             {
@@ -46,7 +48,7 @@ namespace RBP.Web.Controllers
                 return null;
             }
 
-            AccountData accountData = accountDataJson.FromJson<AccountData>();
+            AccountReturnDto accountData = accountDataJson.FromJson<AccountReturnDto>();
 
             if (nameClaim.Value != accountData.Phone)
             {
@@ -59,7 +61,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        protected async Task SetClientData(AccountData? value)
+        protected async Task SetClientData(AccountReturnDto? value)
         {
             if (_accountData is not null)
             {
@@ -120,7 +122,7 @@ namespace RBP.Web.Controllers
         [NonAction]
         protected async Task Login(string phone, string password)
         {
-            AccountData? accountData = AccountService.Accounts.Find(a => a.Phone == phone && !string.IsNullOrEmpty(password));
+            AccountReturnDto? accountData = AccountService.Accounts.Find(a => a.Phone == phone && !string.IsNullOrEmpty(password));
 
             if (accountData is null)
             {

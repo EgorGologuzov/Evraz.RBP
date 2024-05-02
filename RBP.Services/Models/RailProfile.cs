@@ -1,9 +1,9 @@
-﻿namespace RBP.Web.Models
+﻿namespace RBP.Services.Models
 {
-    public class HandbookData
+    class RailProfile
     {
+        public int Id { get; set; }
         public string Name { get; set; }
-        public string Title { get; set; }
         public string Comment { get; set; }
     }
 }

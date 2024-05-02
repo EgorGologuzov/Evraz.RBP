@@ -1,6 +1,7 @@
 ﻿using RBP.Services.Utils;
-using RBP.Web.Dto;
-using RBP.Web.Models;
+using RBP.Services.Dto;
+using RBP.Services.Models;
+using RBP.Services.Static;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
 
@@ -8,7 +9,7 @@ namespace RBP.Web.Services
 {
     public class HandbookService : ApiServiceBase, IHandbookService
     {
-        public static readonly Dictionary<string, List<HandbookEntityData>> Handbooks = new()
+        public static readonly Dictionary<string, List<HandbookEntityReturnDto>> Handbooks = new()
         {
             {
                 "RailProfile",
@@ -93,23 +94,23 @@ namespace RBP.Web.Services
             _logger = logger;
         }
 
-        public async Task<HandbookEntityData?> Get(int id, string handbook) => Handbooks[handbook].Find(e => e.Id == id);
+        public async Task<HandbookEntityReturnDto?> Get(int id, string handbook) => Handbooks[handbook].Find(e => e.Id == id);
 
-        public async Task<IList<HandbookData>> GetAll() => Properties.Handbooks.Config;
+        public async Task<IList<Handbook>> GetAll() => Properties.Handbooks.Config;
 
-        public async Task<HandbookData> GetSegmentsHandbook() => Properties.Handbooks.Config.Find(h => h.Name == "WorkshopSegment");
+        public async Task<Handbook> GetSegmentsHandbook() => Properties.Handbooks.Config.Find(h => h.Name == "WorkshopSegment");
 
-        public async Task<IList<HandbookEntityData>> GetAll(string handbookName) => Handbooks[handbookName];
+        public async Task<IList<HandbookEntityReturnDto>> GetAll(string handbookName) => Handbooks[handbookName];
 
-        public async Task<IList<HandbookEntityData>> GetAllSegments() => Handbooks["WorkshopSegment"];
+        public async Task<IList<HandbookEntityReturnDto>> GetAllSegments() => Handbooks["WorkshopSegment"];
 
-        public async Task<IList<HandbookEntityData>> GetAllSteels() => Handbooks["SteelGrade"];
+        public async Task<IList<HandbookEntityReturnDto>> GetAllSteels() => Handbooks["SteelGrade"];
 
-        public async Task<IList<HandbookEntityData>> GetAllProfiles() => Handbooks["RailProfile"];
+        public async Task<IList<HandbookEntityReturnDto>> GetAllProfiles() => Handbooks["RailProfile"];
 
-        public async Task<IList<HandbookEntityData>> GetAllDefects() => Handbooks["Defect"];
+        public async Task<IList<HandbookEntityReturnDto>> GetAllDefects() => Handbooks["Defect"];
 
-        public async Task<HandbookEntityData> Create(HandbookEntityCreateDto data)
+        public async Task<HandbookEntityReturnDto> Create(HandbookEntityCreateDto data)
         {
             if (Handbooks.ContainsKey(data.HandbookName) == false || Handbooks[data.HandbookName].Find(e => e.Name == data.Name) is not null)
             {
@@ -121,7 +122,7 @@ namespace RBP.Web.Services
             return Handbooks[data.HandbookName][0];
         }
 
-        public async Task<HandbookEntityData> Update(HandbookEntityUpdateDto data)
+        public async Task<HandbookEntityReturnDto> Update(HandbookEntityUpdateDto data)
         {
             if (Handbooks.ContainsKey(data.HandbookName) == false || Handbooks[data.HandbookName].Find(e => e.Id == data.Id) is null)
             {
@@ -133,9 +134,9 @@ namespace RBP.Web.Services
             return Handbooks[data.HandbookName].Find(e => e.Id == data.Id);
         }
 
-        public async Task<HandbookEntityData> Delete(int id, string handbook)
+        public async Task<HandbookEntityReturnDto> Delete(int id, string handbook)
         {
-            HandbookEntityData? entity = await Get(id, handbook);
+            HandbookEntityReturnDto? entity = await Get(id, handbook);
 
             if (entity is null)
             {

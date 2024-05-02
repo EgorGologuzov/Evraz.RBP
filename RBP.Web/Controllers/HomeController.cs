@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
+using RBP.Services.Static;
 using RBP.Web.Models;
 using RBP.Web.Services;
 using RBP.Web.Services.Interfaces;

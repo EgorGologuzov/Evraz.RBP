@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
 using RBP.Services.Utils;
-using RBP.Web.Dto;
+using RBP.Services.Dto;
 using RBP.Web.Models;
+using RBP.Services.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
+using RBP.Services.Static;
 
 namespace RBP.Web.Controllers
 {
@@ -43,14 +44,14 @@ namespace RBP.Web.Controllers
         private async Task<AdminViewModel> BuildViewModel(string title, object data)
         {
             AdminRoleData roleData = _mapper.Map<AdminRoleData>(data);
-            AccountData accountData = new() { Role = ClientRoles.Admin, RoleDataJson = roleData.ToJson() };
+            AccountReturnDto accountData = new() { Role = ClientRoles.Admin, RoleDataJson = roleData.ToJson() };
             _mapper.Map(data, accountData);
 
             return new AdminViewModel(title, GetClientData(), accountData);
         }
 
         [NonAction]
-        private async Task<AdminViewModel> BuildViewModel(string title, AccountData data)
+        private async Task<AdminViewModel> BuildViewModel(string title, AccountReturnDto data)
         {
             return new AdminViewModel(title, GetClientData(), data);
         }
@@ -74,7 +75,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            AccountData data = new()
+            AccountReturnDto data = new()
             {
                 Role = ClientRoles.Admin,
                 RoleDataJson = new AdminRoleData().ToJson()
@@ -95,7 +96,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                AccountData result = await _accountService.CreateAdmin(data);
+                AccountReturnDto result = await _accountService.CreateAdmin(data);
 
                 return RedirectToAction(nameof(Index), new { SearchRequest = string.Empty });
             }
@@ -115,7 +116,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            AccountData? data = await _accountService.Get(id);
+            AccountReturnDto? data = await _accountService.Get(id);
 
             if (data is null)
             {
@@ -137,7 +138,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                AccountData result = await _accountService.UpdateAdmin(data);
+                AccountReturnDto result = await _accountService.UpdateAdmin(data);
 
                 return RedirectToAction(nameof(Index), new { SearchRequest = string.Empty });
             }

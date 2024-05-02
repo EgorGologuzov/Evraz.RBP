@@ -1,6 +1,6 @@
-﻿namespace RBP.Web.Models
+﻿namespace RBP.Services.Models
 {
-    public class SegmentStatisticData
+    public class SegmentStatistic
     {
         public int SegmentId { get; set; }
         public IEnumerable<KeyValuePair<string, decimal>> ProductsInStorageNow { get; set; }
@@ -11,7 +11,7 @@
         public IEnumerable<KeyValuePair<string, decimal>> ShippedProductsForPeriod { get; set; }
         public IEnumerable<KeyValuePair<string, decimal>> DefectedProductsInStorageNow { get; set; }
 
-        public SegmentStatisticData()
+        public SegmentStatistic()
         {
             ProductsInStorageNow = new List<KeyValuePair<string, decimal>>();
             WeightInStorageDynamic = new List<KeyValuePair<DateTime, decimal>>();

@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
 using RBP.Services.Utils;
-using RBP.Web.Dto;
+using RBP.Services.Dto;
+using RBP.Services.Models;
 using RBP.Web.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
+using RBP.Services.Static;
 
 namespace RBP.Web.Controllers
 {
@@ -30,7 +31,7 @@ namespace RBP.Web.Controllers
         [NonAction]
         private async Task<EmployeeListViewModel> BuildViewModel(string title, string searchRequest)
         {
-            IList<HandbookEntityData> segments = await _handbookService.GetAllSegments();
+            IList<HandbookEntityReturnDto> segments = await _handbookService.GetAllSegments();
 
             return new EmployeeListViewModel(title, GetClientData())
             {
@@ -44,14 +45,14 @@ namespace RBP.Web.Controllers
         private async Task<EmployeeViewModel> BuildViewModel(string title, object data)
         {
             EmployeeRoleData roleData = _mapper.Map<EmployeeRoleData>(data);
-            AccountData accountData = new() { Role = ClientRoles.Employee, RoleDataJson = roleData.ToJson() };
+            AccountReturnDto accountData = new() { Role = ClientRoles.Employee, RoleDataJson = roleData.ToJson() };
             _mapper.Map(data, accountData);
 
             return new EmployeeViewModel(title, GetClientData(), accountData, await _handbookService.GetAllSegments());
         }
 
         [NonAction]
-        private async Task<EmployeeViewModel> BuildViewModel(string title, AccountData data)
+        private async Task<EmployeeViewModel> BuildViewModel(string title, AccountReturnDto data)
         {
             return new EmployeeViewModel(title, GetClientData(), data, await _handbookService.GetAllSegments());
         }
@@ -75,7 +76,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            AccountData data = new()
+            AccountReturnDto data = new()
             {
                 Role = ClientRoles.Employee,
                 RoleDataJson = new EmployeeRoleData().ToJson()
@@ -96,7 +97,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                AccountData result = await _accountService.CreateEmployee(data);
+                AccountReturnDto result = await _accountService.CreateEmployee(data);
 
                 return Redirect("/Employee/Index");
             }
@@ -116,7 +117,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            AccountData? data = await _accountService.Get(id);
+            AccountReturnDto? data = await _accountService.Get(id);
 
             if (data is null)
             {
@@ -138,7 +139,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                AccountData result = await _accountService.UpdateEmployee(data);
+                AccountReturnDto result = await _accountService.UpdateEmployee(data);
 
                 return RedirectToAction(nameof(Index), new { SearchRequest = string.Empty });
             }

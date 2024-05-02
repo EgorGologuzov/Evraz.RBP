@@ -1,4 +1,4 @@
-﻿namespace RBP.Web.Dto
+﻿namespace RBP.Services.Dto
 {
     public class AdminUpdateDto
     {

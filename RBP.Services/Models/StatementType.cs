@@ -2,10 +2,10 @@
 {
     public enum StatementType
     {
-        Accept,
-        Storage,
-        Transfer,
-        Shipment
+        Accept = 0,
+        Storage = 1,
+        Transfer = 2,
+        Shipment = 3
     }
 
     public static class StatementTypesConfig

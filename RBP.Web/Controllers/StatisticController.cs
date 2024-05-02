@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RBP.Services;
+using RBP.Services.Models;
+using RBP.Services.Static;
 using RBP.Web.Models;
-using RBP.Web.Services;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
 
@@ -23,7 +23,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<SegmentStatisticViewModel> BuildViewModel(string title, SegmentStatisticData data, DateTime start, DateTime end)
+        private async Task<SegmentStatisticViewModel> BuildViewModel(string title, SegmentStatistic data, DateTime start, DateTime end)
         {
             return new SegmentStatisticViewModel(
                 pageTitle: title,
@@ -44,7 +44,7 @@ namespace RBP.Web.Controllers
             DateTime start = DateTime.Now - TimeSpan.FromDays(7);
             DateTime end = DateTime.Now;
 
-            SegmentStatisticData data = await _statisticService.GetAllWorkshopStatistic(start, end);
+            SegmentStatistic data = await _statisticService.GetAllWorkshopStatistic(start, end);
             SegmentStatisticViewModel model = await BuildViewModel("Статистика цеха", data, start, end);
 
             return View(model);
@@ -62,7 +62,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                SegmentStatisticData data = await _statisticService.GetSegmentStatistic(segmentId, start.Value, end.Value);
+                SegmentStatistic data = await _statisticService.GetSegmentStatistic(segmentId, start.Value, end.Value);
                 SegmentStatisticViewModel model = await BuildViewModel("Статистика", data, start.Value, end.Value);
                 _logger.LogInformation("Запрошена статистика сегмента: {id}, {start} - {end}", segmentId, start, end);
 
@@ -70,7 +70,7 @@ namespace RBP.Web.Controllers
             }
             catch(NotOkResponseException ex)
             {
-                SegmentStatisticViewModel model = await BuildViewModel("Статистика", new SegmentStatisticData(), start.Value, end.Value);
+                SegmentStatisticViewModel model = await BuildViewModel("Статистика", new SegmentStatistic(), start.Value, end.Value);
                 model.ErrorMessage = ex.Message;
 
                 return View(model);

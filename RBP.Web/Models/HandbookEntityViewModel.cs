@@ -1,12 +1,15 @@
-﻿namespace RBP.Web.Models
+﻿using RBP.Services.Dto;
+using RBP.Services.Models;
+
+namespace RBP.Web.Models
 {
     public class HandbookEntityViewModel : ClientBasedViewModel
     {
-        public HandbookData Handbook { get; set; }
-        public HandbookEntityData Entity { get; set; }
+        public Handbook Handbook { get; set; }
+        public HandbookEntityReturnDto Entity { get; set; }
         public string HandbookName => Handbook.Name;
 
-        public HandbookEntityViewModel(string pageTitle, AccountData client, HandbookData handbook, HandbookEntityData entity) : base(pageTitle, client)
+        public HandbookEntityViewModel(string pageTitle, AccountReturnDto client, Handbook handbook, HandbookEntityReturnDto entity) : base(pageTitle, client)
         {
             Entity = entity;
             Handbook = handbook;

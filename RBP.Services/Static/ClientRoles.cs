@@ -1,4 +1,4 @@
-﻿namespace RBP.Services
+﻿namespace RBP.Services.Static
 {
     public static class ClientRoles
     {
