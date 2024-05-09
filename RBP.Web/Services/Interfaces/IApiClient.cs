@@ -4,6 +4,6 @@ namespace RBP.Web.Services.Interfaces
 {
     public interface IApiClient
     {
-        ApiData ApiData { get; }
+        ApiSecrets ApiData { get; }
     }
 }

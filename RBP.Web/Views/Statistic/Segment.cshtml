@@ -1,4 +1,5 @@
 ﻿@using RBP.Web.Utils
+@using RBP.Services.Models
 @using System.Collections.Generic
 @using System.Globalization
 @model SegmentStatisticViewModel
@@ -121,7 +122,7 @@
                             <div>
                                 <h5 class="card-title m-0 mb-2">@string.Format("Динамика отгрузки (перирод {0} дней)", days)</h5>
                                 @Html.ChartOneLine(
-                                    data: Model.Statistic.ShippedWeightDynamic.Select(kvp => KeyValuePair.Create(kvp.Key.ToString(format, provider), kvp.Value))
+                                    data: Model.Statistic.ShippedWeightDynamic.Select(kvp => new StringIntPare(kvp.Key.ToString(format, provider), kvp.Value))
                                 )
                             </div>
                         </div>
@@ -135,7 +136,7 @@
                             <div>
                                 <h5 class="card-title m-0 mb-2">@string.Format("Динамика приемки (перирод {0} дней)", days)</h5>
                                 @Html.ChartOneLine(
-                                    data: Model.Statistic.AcceptedWeightDynamic.Select(kvp => KeyValuePair.Create(kvp.Key.ToString(format, provider), kvp.Value))
+                                    data: Model.Statistic.AcceptedWeightDynamic.Select(kvp => new StringIntPare(kvp.Key.ToString(format, provider), kvp.Value))
                                 )
                             </div>
                         </div>

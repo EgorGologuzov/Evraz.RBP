@@ -1,6 +1,6 @@
 ﻿namespace RBP.Services.Models
 {
-    class Statement
+    public class Statement
     {
         public Guid Id { get; set; }
         public StatementType Type { get; set; }
@@ -13,7 +13,7 @@
         public int SegmentId { get; set; }
         public WorkshopSegment Segment { get; set; }
         public IList<StatementDefect> Defects { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         public Statement()
         {

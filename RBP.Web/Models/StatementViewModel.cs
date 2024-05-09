@@ -9,7 +9,7 @@ namespace RBP.Web.Models
         private EmployeeRoleData _responsible;
         private string _defectsJson;
 
-        public StatementReturnDto Statement { get; set; }
+        public WebStatementReturnDto Statement { get; set; }
         public IList<ProductReturnDto> AllProducts { get; set; }
         public IList<AccountReturnDto> AllEmployees { get; set; }
         public IList<HandbookEntityReturnDto> AllDefects { get; set; }
@@ -22,7 +22,7 @@ namespace RBP.Web.Models
         public string DefectsJson => _defectsJson ??= Statement.Defects.ToJson();
         public int? SegmentId => Statement.Segment?.Id;
 
-        public StatementViewModel(string pageTitle, AccountReturnDto client, StatementReturnDto statement, IList<ProductReturnDto> allProducts, IList<AccountReturnDto> allEmployees, IList<HandbookEntityReturnDto> allDefects, IList<HandbookEntityReturnDto> allSegments) : base(pageTitle, client)
+        public StatementViewModel(string pageTitle, AccountReturnDto client, WebStatementReturnDto statement, IList<ProductReturnDto> allProducts, IList<AccountReturnDto> allEmployees, IList<HandbookEntityReturnDto> allDefects, IList<HandbookEntityReturnDto> allSegments) : base(pageTitle, client)
         {
             Statement = statement;
             AllProducts = allProducts;

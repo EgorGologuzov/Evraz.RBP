@@ -7,7 +7,7 @@ namespace RBP.Web.Services
     {
         public IApiClient Client { get; set; }
 
-        protected ApiData ApiData
+        protected ApiSecrets ApiData
         {
             get
             {

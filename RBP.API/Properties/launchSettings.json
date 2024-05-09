@@ -1,0 +1,30 @@
+{
+  "profiles": {
+    "RBP.API": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\Egor\\source\\repos\\Evraz.RBP\\RBP.API\\bin\\Debug\\net6.0",
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7203;http://localhost:5024"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:54223",
+      "sslPort": 44378
+    }
+  }
+}

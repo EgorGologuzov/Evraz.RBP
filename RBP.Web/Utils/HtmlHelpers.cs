@@ -2,6 +2,7 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using RBP.Services.Models;
 using RBP.Services.Utils;
 using RBP.Web.Models;
 
@@ -13,6 +14,29 @@ namespace RBP.Web.Utils
         public static readonly string[] ChartColors = { "#e52314", "#ed7817", "#fab82e", "#007bff", "#28a745", "#6610f2", "#e83e8c", "#20c997", "#17a2b8" };
 
         public static string GetColor(int index) => ChartColors[index % ChartColors.Length];
+
+        /// <summary>
+        /// Метод для форматирования HTML с ковычками значением, которое тоже может содержать ковычки.
+        /// В HTML допускается использование только одного типа ковычек.
+        /// </summary>
+        public static string SafetyInsert(this string value, string html)
+        {
+            if (html.Contains('\'') && value.Contains('\''))
+            {
+                value = value.Replace("'", "&#39;");
+            }
+            else if (html.Contains('"') && value.Contains('"'))
+            {
+                value = value.Replace("'", "&quot");
+            }
+
+            return string.Format(html, value);
+        }
+
+        public static string EmptyIfNullElse(this object? value, Func<string> elseValue)
+        {
+            return value is null ? string.Empty : elseValue.Invoke();
+        }
 
         public static IHtmlContent TextBox(this IHtmlHelper _,
             string name,
@@ -26,17 +50,17 @@ namespace RBP.Web.Utils
             return new HtmlString(string.Format(@"
             <div class='form-group'>
                 <label for='{0}'>{1}{6}</label>
-                <input type='{2}' id='{0}' name='{0}' class='form-control' placeholder='{3}' {4} {7}>
+                <input {2} {0} class='form-control' {3} {4} {7}>
                 {5}
             </div>",
-            name,
+            name.SafetyInsert("id='{0}' name='{0}'"),
             label,
-            type,
-            placeholder,
-            regex is null ? string.Empty : $"required regex='{regex}'",
-            invalidFeedback is null ? string.Empty : $"<div class='invalid-feedback'>{invalidFeedback}</div>",
-            regex is null ? string.Empty : RedStar,
-            value is null ? string.Empty : $"value='{value}'"
+            type.SafetyInsert("type='{0}'"),
+            placeholder.SafetyInsert("placeholder='{0}'"),
+            regex.EmptyIfNullElse(() => regex.SafetyInsert("required regex='{0}'")),
+            invalidFeedback.EmptyIfNullElse(() => $"<div class='invalid-feedback'>{invalidFeedback}</div>"),
+            regex.EmptyIfNullElse(() => RedStar),
+            value.EmptyIfNullElse(() => value.SafetyInsert("value='{0}'"))
             ));
         }
 
@@ -68,19 +92,19 @@ namespace RBP.Web.Utils
                     <div class='input-group-prepend'>
                         <div class='input-group-text'>{7}</div>
                     </div>
-                    <input type='{2}' id='{0}' name='{0}' class='form-control' placeholder='{3}' {4} {8}>
+                    <input {2} {0} class='form-control' {3} {4} {8}>
                     {5}
                 </div>
             </div>",
-            name,
+            name.SafetyInsert("id='{0}' name='{0}'"),
             label,
-            type,
-            placeholder,
-            regex is null ? string.Empty : $"required regex='{regex}'",
-            invalidFeedback is null ? string.Empty : $"<div class='invalid-feedback'>{invalidFeedback}</div>",
-            regex is null ? string.Empty : RedStar,
+            type.SafetyInsert("type='{0}'"),
+            placeholder.SafetyInsert("placeholder='{0}'"),
+            regex.EmptyIfNullElse(() => regex.SafetyInsert("required regex='{0}'")),
+            invalidFeedback.EmptyIfNullElse(() => $"<div class='invalid-feedback'>{invalidFeedback}</div>"),
+            regex.EmptyIfNullElse(() => RedStar),
             prefix,
-            value is null ? string.Empty : $"value='{value}'"
+            value.EmptyIfNullElse(() => $"value='{value}'")
             ));
         }
 
@@ -98,16 +122,16 @@ namespace RBP.Web.Utils
             return new HtmlString(string.Format(@"
             <div class='form-group {8}'>
                 {1}
-                <input type='{2}' id='{0}' name='{0}' class='form-control' placeholder='{3}' {4} {6} {7}>
+                <input {2} {0} class='form-control' {3} {4} {6} {7}>
                 {5}
             </div>",
-            name,
+            name.SafetyInsert("id='{0}' name='{0}'"),
             string.IsNullOrEmpty(label) ? string.Empty : LabelHtml(label, regex is not null),
-            type,
-            placeholder,
-            regex is null ? string.Empty : $"required regex='{regex}'",
-            invalidFeedback is null ? string.Empty : $"<div class='invalid-feedback'>{invalidFeedback}</div>",
-            value is null ? string.Empty : $"value='{value}'",
+            type.SafetyInsert("type='{0}'"),
+            placeholder.SafetyInsert("placeholder='{0}'"),
+            regex.EmptyIfNullElse(() => regex.SafetyInsert("required regex='{0}'")),
+            invalidFeedback.EmptyIfNullElse(() => $"<div class='invalid-feedback'>{invalidFeedback}</div>"),
+            value.EmptyIfNullElse(() => value.SafetyInsert("value='{0}'")),
             isEnabled ? string.Empty : "disabled",
             bootstrapGridModes
             ));
@@ -130,19 +154,19 @@ namespace RBP.Web.Utils
                     <div class='input-group-prepend'>
                         <div class='input-group-text'>{7}</div>
                     </div>
-                    <input type='{2}' id='{0}' name='{0}' class='form-control' placeholder='{3}' {4} {8}>
+                    <input {2} {0} class='form-control' {3} {4} {8}>
                     {5}
                 </div>
             </div>",
-            name,
+            name.SafetyInsert("id='{0}' name='{0}'"),
             label,
-            type,
-            placeholder,
-            regex is null ? string.Empty : $"required regex='{regex}'",
-            invalidFeedback is null ? string.Empty : $"<div class='invalid-feedback'>{invalidFeedback}</div>",
-            regex is null ? string.Empty : RedStar,
+            type.SafetyInsert("type='{0}'"),
+            placeholder.SafetyInsert("placeholder='{0}'"),
+            regex.EmptyIfNullElse(() => regex.SafetyInsert("required regex='{0}'")),
+            invalidFeedback.EmptyIfNullElse(() => $"<div class='invalid-feedback'>{invalidFeedback}</div>"),
+            regex.EmptyIfNullElse(() => RedStar),
             prefix,
-            value is null ? string.Empty : $"value='{value}'"
+            value.EmptyIfNullElse(() => $"value='{value}'")
             ));
         }
 
@@ -159,13 +183,13 @@ namespace RBP.Web.Utils
             return new HtmlString(string.Format(@"
             <div class='form-group {8}'>
                 <label>{0}{6}</label>
-                <input type='date' name='{1}' class='form-control' {2} {3} {4} {5} {7}>
+                <input type='date' {1} class='form-control' {2} {3} {4} {5} {7}>
             </div>",
             label,
-            name,
-            value is null ? string.Format("value='{0}'", DateTime.Now.ToString("yyyy-MM-dd")) : string.Format("value='{0}'", value.Value.ToString("yyyy-MM-dd")),
-            min is null ? string.Empty : string.Format("min='{0}'", min.Value.ToString("yyyy-MM-dd")),
-            max is null ? string.Empty : string.Format("max='{0}'", max.Value.ToString("yyyy-MM-dd")),
+            name.SafetyInsert("id='{0}' name='{0}'"),
+            value is null ? DateTime.Now.ToString("yyyy-MM-dd").SafetyInsert("value='{0}'") : value.Value.ToString("yyyy-MM-dd").SafetyInsert("value='{0}'"),
+            min.EmptyIfNullElse(() => min.Value.ToString("yyyy-MM-dd").SafetyInsert("min='{0}'")),
+            max.EmptyIfNullElse(() => max.Value.ToString("yyyy-MM-dd").SafetyInsert("max='{0}'")),
             isRequired ? "required" : string.Empty,
             isRequired ? RedStar : string.Empty,
             isEnabled ? string.Empty : "disabled",
@@ -184,16 +208,16 @@ namespace RBP.Web.Utils
             return new HtmlString(string.Format(@"
             <div class='form-group {3}'>
                 <label>{0}</label>
-                <select class='custom-select mr-sm-2' name='{1}' {4}>
+                <select class='custom-select mr-sm-2' {1} {4}>
                     {2}
                 </select>
             </div>",
             label,
-            name,
+            name.SafetyInsert("id='{0}' name='{0}'"),
             string.Concat(items.Select(i => string.Format(
-                "<option {0} value='{1}'>{2}</option>",
+                "<option {0} {1}>{2}</option>",
                 i.Value == value ? "selected" : string.Empty,
-                i.Value,
+                i.Value.SafetyInsert("value='{0}'"),
                 i.Key
                 ))),
             bootstrapGridModes,
@@ -212,14 +236,14 @@ namespace RBP.Web.Utils
             return new HtmlString(string.Format(@"
             <div class='form-group col-12'>
                 <label>{0}{4}</label>
-                <textarea class='form-control' name='{1}' rows='3' {3} {5} {6}>{2}</textarea>
+                <textarea class='form-control' {1} rows='3' {3} {5} {6}>{2}</textarea>
             </div>",
             label,
-            name,
+            name.SafetyInsert("id='{0}' name='{0}'"),
             value,
             isRequired ? "required" : string.Empty,
             isRequired ? RedStar : string.Empty,
-            maxLength is null ? string.Empty : $"maxlength='{maxLength.Value}'",
+            maxLength.EmptyIfNullElse(() => $"maxlength='{maxLength.Value}'"),
             isEnabled ? string.Empty : "disabled"
             ));
         }
@@ -229,9 +253,9 @@ namespace RBP.Web.Utils
             string? value = null)
         {
             return new HtmlString(string.Format(@"
-            <input type='hidden' id={0} name='{0}' value='{1}' />",
-            name,
-            value
+            <input type='hidden' {0} {1} />",
+            name.SafetyInsert("id='{0}' name='{0}'"),
+            value.EmptyIfNullElse(() => value.SafetyInsert("value='{0}'"))
             ));
         }
 
@@ -278,17 +302,17 @@ namespace RBP.Web.Utils
             string method = "get")
         {
             return new HtmlString(string.Format(@"
-            <form method='{4}' action='{0}' class='my-auto' style='max-width: 550px; display: flex; flex-direction: row;'>
+            <form {4} {0} class='my-auto' style='max-width: 550px; display: flex; flex-direction: row;'>
                 <div class='form-group my-0 mr-2' style='flex: 1; max-width: 550px;'>
-                    <input name='{2}' type='text' class='form-control' placeholder='{1}' value='{3}'>
+                    <input {2} type='text' class='form-control' {1} {3}>
                 </div>
                 <button type='submit' class='btn btn-primary'>Найти</button>
             </form>",
-            action,
-            placeholder,
-            name,
-            value,
-            method
+            action.SafetyInsert("action='{0}'"),
+            placeholder.SafetyInsert("placeholder='{0}'"),
+            name.SafetyInsert("id='{0}' name='{0}'"),
+            value.EmptyIfNullElse(() => value.SafetyInsert("value='{0}'")),
+            method.SafetyInsert("method='{0}'")
             ));
         }
 
@@ -334,10 +358,10 @@ namespace RBP.Web.Utils
         }
 
         public static IHtmlContent DistributionBar(this IHtmlHelper _,
-            IEnumerable<KeyValuePair<string, decimal>> data,
+            IEnumerable<StringIntPare> data,
             string? title = null)
         {
-            decimal sum = data.Sum(p => p.Value);
+            decimal sum = data.Sum(p => Math.Abs(p.Value));
 
             return new HtmlString(string.Format(@"
             <div>
@@ -351,11 +375,11 @@ namespace RBP.Web.Utils
             </div>",
             title is null ? string.Empty : $"<h6 class=\"card-subtitle mb-1 text-muted m-0\">{title}</h6>",
             string.Concat(data.Select((p, i) => string.Format(@"
-                <div style=""flex: {0}; background-color: {1};"" data-toggle=""tooltip"" data-placement=""bottom"" title=""{2}"">
+                <div style=""flex: {0}; background-color: {1};"" data-toggle=""tooltip"" data-placement=""bottom"" {2}>
                 </div>",
-                (p.Value / sum).ToString("0.000", CultureInfo.InvariantCulture),
+                (Math.Abs(p.Value) / sum).ToString("0.000", CultureInfo.InvariantCulture),
                 GetColor(i),
-                $"{p.Key} ({Math.Round(p.Value, 1)})"
+                $"{p.Key} ({p.Value})".SafetyInsert("title='{0}'")
                 ))),
             string.Concat(data.Select((p, i) => string.Format(@"
                 <div class=""d-inline-block mt-1 mr-1"">
@@ -372,7 +396,7 @@ namespace RBP.Web.Utils
         }
 
         public static IHtmlContent ChartOneLine(this IHtmlHelper _,
-           IEnumerable<KeyValuePair<string, decimal>> data)
+           IEnumerable<StringIntPare> data)
         {
             return new HtmlString(string.Format(@"
             <div style=""position: relative; width: 100%; height: 230px;"">
@@ -387,17 +411,17 @@ namespace RBP.Web.Utils
 
         public static IHtmlContent ChartDoughnut(this IHtmlHelper _,
             string name,
-            IEnumerable<KeyValuePair<string, decimal>> data)
+            IEnumerable<StringIntPare> data)
         {
             return new HtmlString(string.Format(@"
             <div style=""position: relative; width: 100%; height: 300px;"">
-                <canvas id=""{2}"" class=""chart mx-2 mb-2"" class=""my-1 mx-2""
+                <canvas {2} class=""chart mx-2 mb-2"" class=""my-1 mx-2""
                     chart-labels='{0}'
                     chart-data='{1}' chart-config=""doughnut""></canvas>
             </div>",
             data.Select(kvp => kvp.Key).ToJson(),
             data.Select(kvp => kvp.Value).ToJson(),
-            name
+            name.SafetyInsert("id='{0}' name='{0}'")
             ));
         }
     }

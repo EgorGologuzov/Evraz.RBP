@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RBP.Services.Contracts;
-using RBP.Services.Utils;
 using RBP.Services.Dto;
+using RBP.Services.Static;
 using RBP.Web.Models;
-using RBP.Web.Services;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
-using RBP.Services.Static;
 
 namespace RBP.Web.Controllers
 {
@@ -24,66 +21,6 @@ namespace RBP.Web.Controllers
             _handbookService = handbookService;
             _handbookService.Client = this;
             _mapper = mapper;
-        }
-
-        [NonAction]
-        private async Task<ProductListViewModel> BuildViewModel(string title, string searchRequest)
-        {
-            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
-
-            return new ProductListViewModel(
-                pageTitle: title,
-                client: GetClientData(),
-                products: (await _productService.Find(searchRequest))
-                    .Select(p => new ProductViewModel(null, null, p, profiles, steels)).ToList(),
-                searchRequest: searchRequest
-            );
-        }
-
-        [NonAction]
-        private async Task<ProductViewModel> BuildViewModel(string title, ProductReturnDto data)
-        {
-            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
-
-            return new ProductViewModel(
-                pageTitle: title,
-                client: GetClientData(),
-                product: data,
-                allProfiles: profiles,
-                allSteels: steels
-            );
-        }
-
-        [NonAction]
-        private async Task<ProductViewModel> BuildViewModel(string title, ProductUpdateDto data)
-        {
-            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
-
-            return new ProductViewModel(
-                pageTitle: title,
-                client: GetClientData(),
-                product: _mapper.Map<ProductReturnDto>(data),
-                allProfiles: profiles,
-                allSteels: steels
-            );
-        }
-
-        [NonAction]
-        private async Task<ProductViewModel> BuildViewModel(string title, ProductCreateDto data)
-        {
-            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
-            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
-
-            return new ProductViewModel(
-                pageTitle: title,
-                client: GetClientData(),
-                product: _mapper.Map<ProductReturnDto>(data),
-                allProfiles: profiles,
-                allSteels: steels
-            );
         }
 
         public async Task<IActionResult> Index(string? searchRequest)
@@ -222,6 +159,66 @@ namespace RBP.Web.Controllers
 
                 return View(nameof(Delete), model);
             }
+        }
+
+        [NonAction]
+        private async Task<ProductListViewModel> BuildViewModel(string title, string searchRequest)
+        {
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
+
+            return new ProductListViewModel(
+                pageTitle: title,
+                client: GetClientData(),
+                products: (await _productService.Find(searchRequest))
+                    .Select(p => new ProductViewModel(null, null, p, profiles, steels)).ToList(),
+                searchRequest: searchRequest
+            );
+        }
+
+        [NonAction]
+        private async Task<ProductViewModel> BuildViewModel(string title, ProductReturnDto data)
+        {
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
+
+            return new ProductViewModel(
+                pageTitle: title,
+                client: GetClientData(),
+                product: data,
+                allProfiles: profiles,
+                allSteels: steels
+            );
+        }
+
+        [NonAction]
+        private async Task<ProductViewModel> BuildViewModel(string title, ProductUpdateDto data)
+        {
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
+
+            return new ProductViewModel(
+                pageTitle: title,
+                client: GetClientData(),
+                product: _mapper.Map<ProductReturnDto>(data),
+                allProfiles: profiles,
+                allSteels: steels
+            );
+        }
+
+        [NonAction]
+        private async Task<ProductViewModel> BuildViewModel(string title, ProductCreateDto data)
+        {
+            IList<HandbookEntityReturnDto> profiles = await _handbookService.GetAllProfiles();
+            IList<HandbookEntityReturnDto> steels = await _handbookService.GetAllSteels();
+
+            return new ProductViewModel(
+                pageTitle: title,
+                client: GetClientData(),
+                product: _mapper.Map<ProductReturnDto>(data),
+                allProfiles: profiles,
+                allSteels: steels
+            );
         }
     }
 }

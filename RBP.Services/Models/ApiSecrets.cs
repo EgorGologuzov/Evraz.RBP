@@ -1,6 +1,6 @@
 ﻿namespace RBP.Services.Models
 {
-    public class ApiData
+    public class ApiSecrets
     {
         public string Token { get; set; }
         public DateTime TokenExpirationTime { get; set; }

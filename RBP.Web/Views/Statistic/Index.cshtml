@@ -1,4 +1,5 @@
 ﻿@using RBP.Web.Utils
+@using RBP.Services.Models
 @using System.Collections.Generic
 @using System.Globalization
 @model SegmentStatisticViewModel
@@ -40,7 +41,7 @@
                             <h5 class="card-title m-0">Динамика хранения (@Model.Start.Value.ToString(format, provider) - @Model.End.Value.ToString(format, provider))</h5>
                         </div>
                         @Html.ChartOneLine(
-                                    data: Model.Statistic.WeightInStorageDynamic.Select(w => KeyValuePair.Create(w.Key.ToString(format, provider), w.Value))
+                                    data: Model.Statistic.WeightInStorageDynamic.Select(w => new StringIntPare(w.Key.ToString(format, provider), w.Value))
                                     )
                     </a>
                 </div>

@@ -13,7 +13,7 @@ namespace RBP.Web.Services
             new()
             {
                 Id = Guid.NewGuid(),
-                Name = "КР70, 9 м.",
+                Name = "'КР70, 9 м.",
                 ProfileId = 1,
                 SteelId = 1,
                 PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 4121-76\"},{\"Key\":\"Длина\",\"Value\":\"12 м.\"}]",

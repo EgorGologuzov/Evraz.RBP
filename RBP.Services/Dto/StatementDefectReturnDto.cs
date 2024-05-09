@@ -2,7 +2,7 @@
 {
     public class StatementDefectReturnDto
     {
-        public string DefectName { get; set; }
+        public int DefectId { get; set; }
         public decimal Size { get; set; }
     }
 }

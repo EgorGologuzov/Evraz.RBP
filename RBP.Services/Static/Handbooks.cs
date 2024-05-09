@@ -8,25 +8,25 @@ namespace RBP.Web.Properties
         {
             new()
             {
-                Name = "RailProfile",
+                Name = nameof(RailProfile),
                 Title = "Профили",
                 Comment = "Виды профилей рельсобалочной продукции"
             },
             new()
             {
-                Name = "SteelGrade",
+                Name = nameof(SteelGrade),
                 Title = "Марки стали",
                 Comment = "Марки стали, используемые в производстве"
             },
             new()
             {
-                Name = "Defect",
+                Name = nameof(Defect),
                 Title = "Дефекты",
                 Comment = "Виды дефектов, присущие продукции"
             },
             new()
             {
-                Name = "WorkshopSegment",
+                Name = nameof(WorkshopSegment),
                 Title = "Сегменты цеха",
                 Comment = "Части цеха, в которых может находиться продукция"
             },

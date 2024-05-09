@@ -13,5 +13,10 @@ namespace RBP.Services.Utils
         {
             return JsonConvert.DeserializeObject<T>(value);
         }
+
+        public static object? FromJson(this string value, Type type)
+        {
+            return JsonConvert.DeserializeObject(value, type);
+        }
     }
 }

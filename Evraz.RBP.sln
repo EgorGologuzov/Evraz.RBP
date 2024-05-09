@@ -5,7 +5,11 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RBP.Web", "RBP.Web\RBP.Web.csproj", "{882871A0-2B74-449C-B71F-9E977D12D98B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RBP.Services", "RBP.Services\RBP.Services.csproj", "{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RBP.Services", "RBP.Services\RBP.Services.csproj", "{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RBP.Db", "RBP.Db\RBP.Db.csproj", "{57E72A68-951A-4B91-98AF-B7A48D7B10B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RBP.API", "RBP.API\RBP.API.csproj", "{6B7DA2BB-29BC-4F83-AEFE-02FD7A7D65CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D90B4E78-0104-4F1D-8BC6-767CD4B68A56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57E72A68-951A-4B91-98AF-B7A48D7B10B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57E72A68-951A-4B91-98AF-B7A48D7B10B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57E72A68-951A-4B91-98AF-B7A48D7B10B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57E72A68-951A-4B91-98AF-B7A48D7B10B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B7DA2BB-29BC-4F83-AEFE-02FD7A7D65CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B7DA2BB-29BC-4F83-AEFE-02FD7A7D65CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B7DA2BB-29BC-4F83-AEFE-02FD7A7D65CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B7DA2BB-29BC-4F83-AEFE-02FD7A7D65CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

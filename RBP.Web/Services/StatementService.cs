@@ -8,7 +8,7 @@ namespace RBP.Web.Services
 {
     public class StatementService : ApiServiceBase, IStatementService
     {
-        public static readonly List<StatementReturnDto> Statements = new()
+        public static readonly List<WebStatementReturnDto> Statements = new()
         {
             new()
             {
@@ -46,7 +46,7 @@ namespace RBP.Web.Services
                     Id = 1,
                     Name = "Разгрузка поставок - Приемка"
                 },
-                Defects = new List<StatementDefectReturnDto>
+                Defects = new List<WebStatementDefectReturnDto>
                 {
                     new()
                     {
@@ -105,34 +105,34 @@ namespace RBP.Web.Services
             _logger = logger;
         }
 
-        public async Task<StatementReturnDto?> Get(Guid id)
+        public async Task<WebStatementReturnDto?> Get(Guid id)
         {
             return Statements.Find(s => s.Id == id);
         }
 
-        public async Task<IList<StatementReturnDto>> GetAll(Guid employeeId, DateTime date)
+        public async Task<IList<WebStatementReturnDto>> GetAll(Guid employeeId, DateTime date)
         {
-            return new List<StatementReturnDto> { Statements[1] };
+            return new List<WebStatementReturnDto> { Statements[1] };
         }
 
-        public async Task<IList<StatementReturnDto>> GetAll(int segmentId, DateTime date)
+        public async Task<IList<WebStatementReturnDto>> GetAll(int segmentId, DateTime date)
         {
             return Statements;
         }
 
-        public async Task<IList<StatementReturnDto>> GetAll(int segmentId, DateTime date, Guid employeeId)
+        public async Task<IList<WebStatementReturnDto>> GetAll(int segmentId, DateTime date, Guid employeeId)
         {
-            return new List<StatementReturnDto> { Statements[0] };
+            return new List<WebStatementReturnDto> { Statements[0] };
         }
 
-        public async Task<StatementReturnDto> Create(StatementCreateDto data)
+        public async Task<WebStatementReturnDto> Create(WebStatementCreateDto data)
         {
             _logger.LogInformation("Создана ведомость: {data}", data.ToJson());
 
             return Statements[0];
         }
 
-        public async Task<StatementReturnDto> Delete(Guid id)
+        public async Task<WebStatementReturnDto> Delete(Guid id)
         {
             return Statements.Find(s => s.Id == id);
         }

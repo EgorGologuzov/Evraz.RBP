@@ -1,6 +1,6 @@
 ﻿namespace RBP.Services.Models
 {
-    class Product
+    public class Product
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -9,6 +9,6 @@
         public int SteelId { get; set; }
         public SteelGrade Steel { get; set; }
         public string PropertiesJson { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
     }
 }

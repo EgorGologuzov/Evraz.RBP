@@ -5,12 +5,12 @@ namespace RBP.Web.Services
 {
     public class StatisticService : ApiServiceBase, IStatisticService
     {
-        public static readonly List<SegmentStatistic> Statistic = new()
+        public static readonly List<StatisticData> Statistic = new()
         {
             new()
             {
                 SegmentId = 1,
-                ProductsInStorageNow = new List<KeyValuePair<string, decimal>>
+                ProductsInStorageNow = new List<StringIntPare>
                 {
                     new("Продукт 1", 100),
                     new("Продукт 2", 200),
@@ -18,7 +18,7 @@ namespace RBP.Web.Services
                     new("Продукт 4", 40),
                     new("Продукт 5", 210),
                 },
-                WeightInStorageDynamic = new List<KeyValuePair<DateTime, decimal>>
+                WeightInStorageDynamic = new List<DateIntPare>
                 {
                     new(DateTime.Now, 180),
                     new(DateTime.Now + TimeSpan.FromDays(1), 200),
@@ -28,7 +28,7 @@ namespace RBP.Web.Services
                     new(DateTime.Now + TimeSpan.FromDays(5), 210),
                     new(DateTime.Now + TimeSpan.FromDays(6), 270),
                 },
-                AcceptedWeightDynamic = new List<KeyValuePair<DateTime, decimal>>
+                AcceptedWeightDynamic = new List<DateIntPare>
                 {
                     new(DateTime.Now, 35),
                     new(DateTime.Now + TimeSpan.FromDays(1), 29),
@@ -38,7 +38,7 @@ namespace RBP.Web.Services
                     new(DateTime.Now + TimeSpan.FromDays(5), 23),
                     new(DateTime.Now + TimeSpan.FromDays(6), 23),
                 },
-                ShippedWeightDynamic = new List<KeyValuePair<DateTime, decimal>>
+                ShippedWeightDynamic = new List<DateIntPare>
                 {
                     new(DateTime.Now, 30),
                     new(DateTime.Now + TimeSpan.FromDays(1), 25),
@@ -48,7 +48,7 @@ namespace RBP.Web.Services
                     new(DateTime.Now + TimeSpan.FromDays(5), 33),
                     new(DateTime.Now + TimeSpan.FromDays(6), 20),
                 },
-                AcceptedProductsForPeriod = new List<KeyValuePair<string, decimal>>
+                AcceptedProductsForPeriod = new List<StringIntPare>
                 {
                     new("Продукт 1", 300),
                     new("Продукт 2", 400),
@@ -56,7 +56,7 @@ namespace RBP.Web.Services
                     new("Продукт 4", 300),
                     new("Продукт 5", 210),
                 },
-                ShippedProductsForPeriod = new List<KeyValuePair<string, decimal>>
+                ShippedProductsForPeriod = new List<StringIntPare>
                 {
                     new("Продукт 1", 200),
                     new("Продукт 2", 340),
@@ -64,7 +64,7 @@ namespace RBP.Web.Services
                     new("Продукт 4", 230),
                     new("Продукт 5", 260),
                 },
-                DefectedProductsInStorageNow = new List<KeyValuePair<string, decimal>>
+                DefectedProductsInStorageNow = new List<StringIntPare>
                 {
                     new("Продукт 1", 7),
                     new("Продукт 2", 3),
@@ -75,12 +75,12 @@ namespace RBP.Web.Services
             }
         };
 
-        public async Task<SegmentStatistic> GetSegmentStatistic(int segmentId, DateTime start, DateTime end)
+        public async Task<StatisticData> GetSegmentStatistic(int segmentId, DateTime start, DateTime end)
         {
             return Statistic.Find(s => s.SegmentId == segmentId) ?? Statistic[0];
         }
 
-        public async Task<SegmentStatistic> GetAllWorkshopStatistic(DateTime start, DateTime end)
+        public async Task<StatisticData> GetAllWorkshopStatistic(DateTime start, DateTime end)
         {
             return Statistic[0];
         }

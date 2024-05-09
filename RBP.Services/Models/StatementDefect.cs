@@ -1,6 +1,6 @@
 ﻿namespace RBP.Services.Models
 {
-    class StatementDefect
+    public class StatementDefect
     {
         public Guid StatementId { get; set; }
         public int DefectId { get; set; }

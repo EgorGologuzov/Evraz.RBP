@@ -61,7 +61,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                IList<StatementReturnDto> data = ClientInRole(ClientRoles.Employee)
+                IList<WebStatementReturnDto> data = ClientInRole(ClientRoles.Employee)
                     ? await _statementService.GetAll(segmentId, date.Value, GetClientData().Id)
                     : await _statementService.GetAll(segmentId, date.Value);
                 StatementListViewModel model = await BuildViewModel(data, segmentId, date.Value);
@@ -95,7 +95,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                IList<StatementReturnDto> data = await _statementService.GetAll(employeeId, date.Value);
+                IList<WebStatementReturnDto> data = await _statementService.GetAll(employeeId, date.Value);
                 StatementListViewModel model = await BuildViewModel(data, employee, date.Value);
                 _logger.LogInformation("Запрошен список ведомостей сотрдуника: {id}, {date}", employee.Id, date);
 
@@ -119,7 +119,7 @@ namespace RBP.Web.Controllers
 
             StatementViewModel model = await BuildViewModel(
                 "Создание",
-                new StatementReturnDto
+                new WebStatementReturnDto
                 {
                     Segment = segmentId is null ? null : new HandbookEntityReturnDto { Id = segmentId.Value }
                 }
@@ -129,7 +129,7 @@ namespace RBP.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(StatementCreateDto data)
+        public async Task<IActionResult> Create(WebStatementCreateDto data)
         {
             if (await IsAuthorized(ClientRoles.Employee) == false)
             {
@@ -138,7 +138,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                StatementReturnDto result = await _statementService.Create(data);
+                WebStatementReturnDto result = await _statementService.Create(data);
 
                 return RedirectToAction(nameof(List), new { data.SegmentId, Date = DateTime.Now });
             }
@@ -158,7 +158,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            StatementReturnDto? data = await _statementService.Get(id);
+            WebStatementReturnDto? data = await _statementService.Get(id);
 
             if (data is null)
             {
@@ -177,7 +177,7 @@ namespace RBP.Web.Controllers
                 return RedirectUnauthorizedAction();
             }
 
-            StatementReturnDto? entity = await _statementService.Get(id);
+            WebStatementReturnDto? entity = await _statementService.Get(id);
 
             if (entity is null)
             {
@@ -196,7 +196,7 @@ namespace RBP.Web.Controllers
 
             try
             {
-                StatementReturnDto result = await _statementService.Delete(id);
+                WebStatementReturnDto result = await _statementService.Delete(id);
                 StatementViewModel model = await BuildViewModel("Удаление", result);
                 model.OkMessage = "Ведомость удалена";
 
@@ -204,7 +204,7 @@ namespace RBP.Web.Controllers
             }
             catch (NotOkResponseException ex)
             {
-                StatementViewModel model = await BuildViewModel("Удаление", new StatementReturnDto());
+                StatementViewModel model = await BuildViewModel("Удаление", new WebStatementReturnDto());
                 model.ErrorMessage = ex.Message;
 
                 return View(nameof(Delete), model);
@@ -223,7 +223,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<StatementListViewModel> BuildViewModel(IList<StatementReturnDto> data, int segmentId, DateTime date)
+        private async Task<StatementListViewModel> BuildViewModel(IList<WebStatementReturnDto> data, int segmentId, DateTime date)
         {
             HandbookEntityReturnDto segment = (await _handbookService.GetAllSegments()).First(s => s.Id == segmentId);
 
@@ -237,7 +237,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<StatementListViewModel> BuildViewModel(IList<StatementReturnDto> data, AccountReturnDto employee, DateTime date)
+        private async Task<StatementListViewModel> BuildViewModel(IList<WebStatementReturnDto> data, AccountReturnDto employee, DateTime date)
         {
             return new StatementListViewModel(
                 pageTitle: employee.Name,
@@ -249,7 +249,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<StatementViewModel> BuildViewModel(string title, StatementReturnDto data)
+        private async Task<StatementViewModel> BuildViewModel(string title, WebStatementReturnDto data)
         {
             Task<IList<ProductReturnDto>> allProducts = _productService.GetAll();
             Task<IList<AccountReturnDto>> allEmployees = _accountService.GetAll(ClientRoles.Employee);
@@ -269,7 +269,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        private async Task<StatementViewModel> BuildViewModel(string title, StatementCreateDto data)
+        private async Task<StatementViewModel> BuildViewModel(string title, WebStatementCreateDto data)
         {
             Task<IList<ProductReturnDto>> allProducts = _productService.GetAll();
             Task<IList<AccountReturnDto>> allEmployees = _accountService.GetAll(ClientRoles.Employee);
@@ -281,7 +281,7 @@ namespace RBP.Web.Controllers
             return new StatementViewModel(
                 pageTitle: title,
                 client: GetClientData(),
-                statement: _mapper.Map<StatementReturnDto>(data),
+                statement: _mapper.Map<WebStatementReturnDto>(data),
                 allProducts: allProducts.Result,
                 allEmployees: allEmployees.Result,
                 allDefects: allDefects.Result,

@@ -21,10 +21,10 @@ namespace RBP.Web.Controllers
         private const string _loginPagePath = "/Account/Login";
 
         private AccountReturnDto? _accountData;
-        private ApiData? _apiData;
+        private ApiSecrets? _apiData;
         private Func<IActionResult> _unauthorizedAction;
 
-        public ApiData? ApiData => GetApiData();
+        public ApiSecrets? ApiData => GetApiData();
 
         [NonAction]
         protected AccountReturnDto? GetClientData()
@@ -85,7 +85,7 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        protected ApiData? GetApiData()
+        protected ApiSecrets? GetApiData()
         {
             if (_apiData is not null)
             {
@@ -99,13 +99,13 @@ namespace RBP.Web.Controllers
                 return null;
             }
 
-            _apiData = data.FromJson<ApiData>();
+            _apiData = data.FromJson<ApiSecrets>();
 
             return _apiData;
         }
 
         [NonAction]
-        protected void SetApiData(ApiData? value)
+        protected void SetApiData(ApiSecrets? value)
         {
             _apiData = value;
 
@@ -129,7 +129,7 @@ namespace RBP.Web.Controllers
                 throw new AuthenticationException();
             }
 
-            ApiData apiData = new()
+            ApiSecrets apiData = new()
             {
                 Token = "test-token",
                 TokenExpirationTime = DateTime.Now + TimeSpan.FromHours(1),
@@ -172,7 +172,7 @@ namespace RBP.Web.Controllers
         [NonAction]
         protected async Task RefreshToken()
         {
-            ApiData data = new()
+            ApiSecrets data = new()
             {
                 Token = "test-token",
                 TokenExpirationTime = DateTime.Now + TimeSpan.FromHours(1),
