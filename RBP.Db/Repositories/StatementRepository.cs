@@ -33,6 +33,7 @@ namespace RBP.Db.Repositories
                     && (segmentId == null || s.SegmentId == segmentId)
                     && s.Date >= start
                     && s.Date < end)
+                .OrderByDescending(s => s.Date)
                 .Include(s => s.Defects)
                 .ToListAsync();
         }

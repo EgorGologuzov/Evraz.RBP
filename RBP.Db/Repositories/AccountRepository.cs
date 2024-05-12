@@ -16,7 +16,10 @@ namespace RBP.Db.Repositories
 
         public async Task<IList<Account>> Find(string? name, string role)
         {
-            return await DbSet.Where(a => EF.Functions.ILike(a.Name, $"{name}%") && a.Role == role).ToListAsync();
+            return await DbSet
+                .Where(a => EF.Functions.ILike(a.Name, $"{name}%") && a.Role == role)
+                .OrderByDescending(a => a.CreationTime)
+                .ToListAsync();
         }
 
         public Task<Account?> Get(string phone)
@@ -26,7 +29,10 @@ namespace RBP.Db.Repositories
 
         public async Task<IList<Account>> GetAll(string role)
         {
-            return await DbSet.Where(a => a.Role == role).ToListAsync();
+            return await DbSet
+                .Where(a => a.Role == role)
+                .OrderByDescending(a => a.CreationTime)
+                .ToListAsync();
         }
 
         public async Task ResetPassword(Guid userId, string newPassword)

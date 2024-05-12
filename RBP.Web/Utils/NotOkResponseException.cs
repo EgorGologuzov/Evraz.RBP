@@ -2,9 +2,9 @@
 {
     public class NotOkResponseException : Exception
     {
-        public int Code { get; set; }
+        public readonly int Code;
 
-        public NotOkResponseException() : base()
+        private NotOkResponseException() : base()
         {
         }
 
@@ -12,8 +12,13 @@
         {
         }
 
-        public NotOkResponseException(string? message, Exception? innerException) : base(message, innerException)
+        private NotOkResponseException(string? message, Exception? innerException) : base(message, innerException)
         {
+        }
+
+        public NotOkResponseException(int code, string? message) : base(message)
+        {
+            Code = code;
         }
     }
 }

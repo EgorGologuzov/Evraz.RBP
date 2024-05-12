@@ -20,6 +20,7 @@ namespace RBP.API.Controllers
             Mapper = mapper;
         }
 
+        [NonAction]
         protected BadRequestObjectResult BadRequest<TException>(TException exception) where TException : Exception
         {
             return base.BadRequest(new BadRequestReturn
@@ -28,6 +29,14 @@ namespace RBP.API.Controllers
                 Message = exception.Message,
                 Data = exception.Data
             });
+        }
+
+        [NonAction]
+        public string? GetClaimValue(string type)
+        {
+            Claim? claim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == type);
+
+            return claim?.Value;
         }
 
         [NonAction]

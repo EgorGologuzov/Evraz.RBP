@@ -20,7 +20,10 @@ namespace RBP.Db.Repositories
         {
             name.CheckNotNull(nameof(name));
 
-            return await DbSet.Where(a => EF.Functions.ILike(a.Name, $"{name}%")).ToListAsync();
+            return await DbSet
+                .Where(a => EF.Functions.ILike(a.Name, $"{name}%"))
+                .OrderBy(a => a.Name)
+                .ToListAsync();
         }
 
         public async Task<IList<Product>> GetAll()
@@ -32,7 +35,7 @@ namespace RBP.Db.Repositories
                 return result;
             }
 
-            result = await DbSet.ToListAsync();
+            result = await DbSet.OrderBy(a => a.Name).ToListAsync();
             _memoryCash.Set(nameof(Product), result);
 
             return result;

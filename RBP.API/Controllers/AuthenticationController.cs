@@ -1,12 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RBP.API.Utils;
 using RBP.Services.Contracts;
+using RBP.Services.Dto;
 using RBP.Services.Models;
 using RBP.Services.Static;
 using RBP.Services.Utils;
@@ -34,7 +37,7 @@ namespace RBP.API.Controllers
         {
             Account? account = await Repository.Get(secrets.Phone ?? string.Empty);
 
-            if (account is null || account.PasswordHash != secrets.Password?.ToSha256Hash())
+            if (account is null || account.PasswordHash != secrets.Password?.ToSha256Hash() || !account.IsActive)
             {
                 return Forbid();
             }
@@ -49,7 +52,31 @@ namespace RBP.API.Controllers
             {
                 Token = GenerateToken(claims),
                 TokenExpirationTime = DateTime.UtcNow.Add(_tokenExpirationTimeSpan),
-                RecommendedRefreshTokenTime = DateTime.UtcNow.Add(_recommendedRefreshTokenTimeSpan)
+                RecommendedRefreshTokenTime = DateTime.UtcNow.Add(_recommendedRefreshTokenTimeSpan),
+                Account = Mapper.Map<AccountReturnDto>(account)
+            };
+
+            return Ok(apiSecrets);
+        }
+
+        [HttpPost("Refresh")]
+        [Authorize]
+        public async Task<IActionResult> RefreshToken()
+        {
+            Account? account = await Repository.Get(Guid.Parse(GetClaimValue(ClaimTypes.PrimarySid)));
+
+            List<Claim> claims = new()
+            {
+                new(ClaimTypes.Role, account.Role),
+                new(ClaimTypes.PrimarySid, account.Id.ToString())
+            };
+
+            ApiSecrets apiSecrets = new()
+            {
+                Token = GenerateToken(claims),
+                TokenExpirationTime = DateTime.UtcNow.Add(_tokenExpirationTimeSpan),
+                RecommendedRefreshTokenTime = DateTime.UtcNow.Add(_recommendedRefreshTokenTimeSpan),
+                Account = Mapper.Map<AccountReturnDto>(account)
             };
 
             return Ok(apiSecrets);

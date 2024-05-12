@@ -75,7 +75,7 @@
                     <a class="h-100" style="color: black; text-decoration: none;">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title m-0 mb-2">@string.Format("Принято (перирод {0} дней)", days)</h5>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Принято (период {0} дней)", days)</h5>
                                 @Html.ChartDoughnut(
                                          name: nameof(Model.Statistic.AcceptedProductsForPeriod),
                                          data: Model.Statistic.AcceptedProductsForPeriod
@@ -90,7 +90,7 @@
                     <a class="h-100" style="color: black; text-decoration: none;">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title m-0 mb-2">@string.Format("Отгружено (перирод {0} дней)", days)</h5>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Отгружено (период {0} дней)", days)</h5>
                                 @Html.ChartDoughnut(
                                          name: nameof(Model.Statistic.ShippedProductsForPeriod),
                                          data: Model.Statistic.ShippedProductsForPeriod
@@ -120,7 +120,7 @@
                     <a class="h-100" style="color: black; text-decoration: none;">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title m-0 mb-2">@string.Format("Динамика отгрузки (перирод {0} дней)", days)</h5>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Динамика отгрузки (период {0} дней)", days)</h5>
                                 @Html.ChartOneLine(
                                     data: Model.Statistic.ShippedWeightDynamic.Select(kvp => new StringIntPare(kvp.Key.ToString(format, provider), kvp.Value))
                                 )
@@ -134,7 +134,7 @@
                     <a class="h-100" style="color: black; text-decoration: none;">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title m-0 mb-2">@string.Format("Динамика приемки (перирод {0} дней)", days)</h5>
+                                <h5 class="card-title m-0 mb-2">@string.Format("Динамика приемки (период {0} дней)", days)</h5>
                                 @Html.ChartOneLine(
                                     data: Model.Statistic.AcceptedWeightDynamic.Select(kvp => new StringIntPare(kvp.Key.ToString(format, provider), kvp.Value))
                                 )

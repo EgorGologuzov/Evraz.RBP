@@ -12,6 +12,7 @@
         public const string HandbookEntityNamePattern = "^.{1,30}$";
         public const string JobTitlePattern = @"^[А-ЯЁа-яё\d\s]{1,40}$";
         public const string PasswordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,25}$";
+        public const string PasswordMessage = "Пароль должен содержать от 8 до 25 символов, одну большую и одну маленькую латинские буквы, цифру и спец. символ";
         public const string PhonePattern = @"^\d{10}$";
         public const string ProductNamePattern = "^.{1,40}$";
         public const string PropertyNamePattern = "^.{1,40}$";

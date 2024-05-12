@@ -56,6 +56,12 @@ namespace RBP.Web.Controllers
             return new AdminViewModel(title, GetClientData(), data);
         }
 
+        [NonAction]
+        private async Task<AccountSecretsViewModel> BuildViewModel(string title, AccountSecrets secrets)
+        {
+            return new AccountSecretsViewModel(title, GetClientData(), secrets);
+        }
+
         public async Task<IActionResult> Index(string? searchRequest)
         {
             if (await IsAuthorized(ClientRoles.Admin) == false)
@@ -96,9 +102,10 @@ namespace RBP.Web.Controllers
 
             try
             {
-                AccountReturnDto result = await _accountService.CreateAdmin(data);
+                AccountSecrets result = await _accountService.CreateAdmin(data);
+                AccountSecretsViewModel model = await BuildViewModel("Создан аккаунт", result);
 
-                return RedirectToAction(nameof(Index), new { SearchRequest = string.Empty });
+                return View("~/Views/Account/Secrets.cshtml", model);
             }
             catch (NotOkResponseException ex)
             {

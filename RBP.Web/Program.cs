@@ -25,6 +25,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = cultures;
 });
 
+builder.Services.AddHttpClient();
+
 // Add sessions ... (next more)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

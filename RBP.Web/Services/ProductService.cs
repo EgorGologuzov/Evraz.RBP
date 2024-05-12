@@ -3,52 +3,23 @@ using RBP.Services.Utils;
 using RBP.Services.Dto;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
+using RBP.Web.Properties;
+using System.Xml.Linq;
+using RBP.Services.Exceptions;
 
 namespace RBP.Web.Services
 {
     public class ProductService : ApiServiceBase, IProductService
     {
-        public static readonly List<ProductReturnDto> Products = new()
+        public ProductService(HttpClient client, ILogger<ProductService> logger) : base(client, logger)
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "'КР70, 9 м.",
-                ProfileId = 1,
-                SteelId = 1,
-                PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 4121-76\"},{\"Key\":\"Длина\",\"Value\":\"12 м.\"}]",
-                Comment = "Крановый рельс. Применяется при прокладке подкрановых путей, необходимых для работы подъёмных кранов."
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Т62, 12.5 м.",
-                ProfileId = 1,
-                SteelId = 2,
-                PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 21174-75\"},{\"Key\":\"Длина\",\"Value\":\"12.5 м.\"}]",
-                Comment = "Рельс трамвайный."
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Р-18",
-                ProfileId = 2,
-                SteelId = 1,
-                PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 6368-82\"},{\"Key\":\"Длина\",\"Value\":\"9 м.\"}]",
-                Comment = "Рельсы железнодорожные Р-18 предназначены для укладки на железных дорогах узкой колеи и подземных путях шахт."
-            }
-        };
-
-        private readonly ILogger<ProductService> _logger;
-
-        public ProductService(ILogger<ProductService> logger)
-        {
-            _logger = logger;
         }
 
         public async Task<ProductReturnDto?> Get(Guid id)
         {
-            return Products.Find(p => p.Id == id);
+            HttpResponseMessage response = await Http.GetAsync($"Product/Get/{id}");
+
+            return response.IsSuccessStatusCode ? await response.FromContent<ProductReturnDto>() : null;
         }
 
         public async Task<IList<ProductReturnDto>> Find(string name)
@@ -58,54 +29,55 @@ namespace RBP.Web.Services
                 return await GetAll();
             }
 
-            return Products.Where(p => p.Name.Contains(name)).ToList();
+            HttpResponseMessage response = await Http.GetAsync($"Product/Find/{name}");
+
+            return response.IsSuccessStatusCode ? await response.FromContent<IList<ProductReturnDto>>() : new List<ProductReturnDto>();
         }
 
         public async Task<IList<ProductReturnDto>> GetAll()
         {
-            return Products;
+            HttpResponseMessage response = await Http.GetAsync("Product/GetAll");
+
+            return response.IsSuccessStatusCode ? await response.FromContent<IList<ProductReturnDto>>() : new List<ProductReturnDto>();
         }
 
-        public async Task<ProductReturnDto> Create(ProductCreateDto data)
+        public Task<ProductReturnDto> Create(ProductCreateDto data)
         {
-            ProductReturnDto? product = Products.Find(p => p.Name == data.Name);
-
-            if (product is not null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Продукт с таким именм уже существует");
-            }
+                HttpResponseMessage response = await Http.PostAsync("Product/Create", data.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Создан продукт: {data}", data.ToJson());
-
-            return Products[0];
+                return await response.FromContent<ProductReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Продукт с таким именем уже существует" : null);
         }
 
-        public async Task<ProductReturnDto> Update(ProductUpdateDto data)
+        public Task<ProductReturnDto> Update(ProductUpdateDto data)
         {
-            ProductReturnDto? product = Products.Find(p => p.Id == data.Id);
-
-            if (product is null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Продукта не существует");
-            }
+                HttpResponseMessage response = await Http.PutAsync("Product/Update", data.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Обновлены данные продукта: {data}", data.ToJson());
-
-            return product;
+                return await response.FromContent<ProductReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Продукт с таким именем уже существует" : null);
         }
 
-        public async Task<ProductReturnDto> Delete(Guid id)
+        public Task<ProductReturnDto> Delete(Guid id)
         {
-            ProductReturnDto? product = Products.Find(p => p.Id == id);
-
-            if (product is null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Продукта не существует");
-            }
+                HttpResponseMessage response = await Http.DeleteAsync($"Product/Delete/{id}");
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Удален продукт: {id}", id);
-
-            return product;
+                return await response.FromContent<ProductReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Продукт нельзя удалить пока существуют связанные сущности" : null);
         }
     }
 }

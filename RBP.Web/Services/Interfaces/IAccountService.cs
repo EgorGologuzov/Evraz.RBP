@@ -1,17 +1,19 @@
 ﻿using RBP.Services.Dto;
+using RBP.Services.Models;
 
 namespace RBP.Web.Services.Interfaces
 {
     public interface IAccountService : IApiService
     {
         Task<AccountReturnDto?> Get(Guid id);
+        Task<ApiSecrets?> Login(string phone, string password);
         Task<IList<AccountReturnDto>> Find(string? name, string role);
         Task<IList<AccountReturnDto>> GetAll(string role);
-        Task<AccountReturnDto> CreateEmployee(EmployeeCreateDto data);
+        Task<AccountSecrets> CreateEmployee(EmployeeCreateDto data);
         Task<AccountReturnDto> UpdateEmployee(EmployeeUpdateDto data);
-        Task<AccountReturnDto> CreateAdmin(AdminCreateDto data);
+        Task<AccountSecrets> CreateAdmin(AdminCreateDto data);
         Task<AccountReturnDto> UpdateAdmin(AdminUpdateDto data);
-        Task<bool> ResetPassword(Guid userId, string newPassword);
-        Task<bool> UpdatePassword(Guid userId, string oldPassword, string newPassword);
+        Task ResetPassword(Guid userId, string newPassword);
+        Task UpdatePassword(Guid userId, string oldPassword, string newPassword);
     }
 }

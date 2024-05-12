@@ -12,15 +12,19 @@ namespace RBP.Web.Utils
             CreateMap<AccountReturnDto, Account>().ReverseMap();
             CreateMap<AccountUpdateDto, Account>().ReverseMap();
             CreateMap<AdminCreateDto, Account>().ReverseMap();
+            CreateMap<AdminCreateDto, AccountCreateDto>().ReverseMap();
             CreateMap<AdminCreateDto, AccountReturnDto>().ReverseMap();
             CreateMap<AdminCreateDto, AdminRoleData>().ReverseMap();
             CreateMap<AdminUpdateDto, Account>().ReverseMap();
+            CreateMap<AdminUpdateDto, AccountUpdateDto>().ReverseMap();
             CreateMap<AdminUpdateDto, AccountReturnDto>().ReverseMap();
             CreateMap<AdminUpdateDto, AdminRoleData>().ReverseMap();
             CreateMap<EmployeeCreateDto, Account>().ReverseMap();
+            CreateMap<EmployeeCreateDto, AccountCreateDto>().ReverseMap();
             CreateMap<EmployeeCreateDto, AccountReturnDto>().ReverseMap();
             CreateMap<EmployeeCreateDto, EmployeeRoleData>().ReverseMap();
             CreateMap<EmployeeUpdateDto, Account>().ReverseMap();
+            CreateMap<EmployeeUpdateDto, AccountUpdateDto>().ReverseMap();
             CreateMap<EmployeeUpdateDto, AccountReturnDto>().ReverseMap();
             CreateMap<EmployeeUpdateDto, EmployeeRoleData>().ReverseMap();
             CreateMap<HandbookEntityCreateDto, HandbookEntityReturnDto>().ReverseMap();
@@ -36,6 +40,9 @@ namespace RBP.Web.Utils
             CreateMap<StatementReturnDto, Statement>().ReverseMap();
             CreateMap<WebStatementCreateDto, Statement>().ReverseMap();
             CreateMap<WebStatementCreateDto, WebStatementReturnDto>().ReverseMap();
+            CreateMap<WebStatementCreateDto, StatementCreateDto>().ReverseMap();
+            CreateMap<StatementReturnDto, WebStatementReturnDto>().ReverseMap();
+            CreateMap<WebStatementDefectReturnDto, StatementDefectReturnDto>().ReverseMap();
         }
     }
 }

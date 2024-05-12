@@ -28,7 +28,7 @@
                             <a class="h-100" href="/Statement/Edit?Id=@vm.Statement.Id" style="color: black; text-decoration: none;">
                                 <div class="card-body">
                                     <h5 class="card-title m-0">@string.Format("{0} ({1} кг.)", vm.Statement.Product.Name, vm.Statement.Weight.ToString())</h5>
-                                    <h6 class="card-subtitle mb-1 text-muted m-0">@vm.Statement.Date.ToString("D", provider)</h6>
+                                    <h6 class="card-subtitle mb-1 text-muted m-0">@vm.Statement.Date.ToString("g", provider)</h6>
                                     <p class="card-text">@vm.Statement.Responsible.Name</p>
                                 </div>
                             </a>

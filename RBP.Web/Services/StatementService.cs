@@ -3,138 +3,159 @@ using RBP.Services.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Services.Dto;
 using RBP.Services.Static;
+using AutoMapper;
+using System.Net;
+using System.Runtime.InteropServices;
+using RBP.Services.Exceptions;
 
 namespace RBP.Web.Services
 {
     public class StatementService : ApiServiceBase, IStatementService
     {
-        public static readonly List<WebStatementReturnDto> Statements = new()
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Now,
-                Weight = 1340,
-                Product = new ProductReturnDto
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "КР70, 9 м.",
-                    ProfileId = 1,
-                    SteelId = 1,
-                    PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 4121-76\"},{\"Key\":\"Длина\",\"Value\":\"12 м.\"}]",
-                    Comment = "Крановый рельс. Применяется при прокладке подкрановых путей, необходимых для работы подъёмных кранов."
-                },
-                Responsible = new AccountReturnDto
-                {
-                    Id = Guid.NewGuid(),
-                    Phone = "1111111111",
-                    Name = "Иванов Иван Иванович",
-                    Role = ClientRoles.Employee,
-                    CreationTime = DateTime.Now - TimeSpan.FromHours(10),
-                    Comment = "Comment text",
-                    IsActive = true,
-                    RoleDataJson = new EmployeeRoleData
-                    {
-                        SegmentId = 1,
-                        Gender = "М",
-                        BirthDate = DateTime.Now - TimeSpan.FromDays(365 * 30),
-                        EmploymentDate = DateTime.Now - TimeSpan.FromDays(365 * 10)
-                    }.ToJson()
-                },
-                Segment = new HandbookEntityReturnDto
-                {
-                    Id = 1,
-                    Name = "Разгрузка поставок - Приемка"
-                },
-                Defects = new List<WebStatementDefectReturnDto>
-                {
-                    new()
-                    {
-                        DefectName = "Скол",
-                        Size = 23.5674m
-                    },
-                    new()
-                    {
-                        DefectName = "Трещина",
-                        Size = 3.5674m
-                    }
-                }
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Now,
-                Weight = 300,
-                Product = new ProductReturnDto
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Т62, 12.5 м.",
-                    ProfileId = 1,
-                    SteelId = 2,
-                    PropertiesJson = "[{\"Key\":\"Стандарт\",\"Value\":\"ГОСТ 21174-75\"},{\"Key\":\"Длина\",\"Value\":\"12.5 м.\"}]",
-                    Comment = "Рельс трамвайный."
-                },
-                Responsible = new AccountReturnDto
-                {
-                    Id = Guid.NewGuid(),
-                    Phone = "3333333333",
-                    Name = "Ахматова Галина Николаевна",
-                    Role = ClientRoles.Employee,
-                    CreationTime = DateTime.Now - TimeSpan.FromHours(10),
-                    IsActive = false,
-                    RoleDataJson = new EmployeeRoleData
-                    {
-                        SegmentId = 3,
-                        Gender = "Ж",
-                        BirthDate = DateTime.Now - TimeSpan.FromDays(365 * 35),
-                        EmploymentDate = DateTime.Now - TimeSpan.FromDays(365 * 4)
-                    }.ToJson()
-                },
-                Segment = new HandbookEntityReturnDto
-                {
-                    Id = 2,
-                    Name = "Разгрузка поставок - Склад"
-                },
-            },
-        };
+        private readonly IAccountService _accountService;
+        private readonly IHandbookService _handbookService;
+        private readonly IProductService _productService;
+        private readonly IMapper _mapper;
 
-        private readonly ILogger<StatementService> _logger;
-
-        public StatementService(ILogger<StatementService> logger)
+        public StatementService(
+            HttpClient client,
+            ILogger<StatementService> logger,
+            IAccountService accountService,
+            IHandbookService handbookService,
+            IProductService productService,
+            IMapper mapper) : base(client, logger)
         {
-            _logger = logger;
+            _accountService = accountService;
+            _handbookService = handbookService;
+            _productService = productService;
+            _mapper = mapper;
+        }
+
+        private async Task<WebStatementReturnDto> Convert(StatementReturnDto data)
+        {
+            WebStatementReturnDto result = _mapper.Map<WebStatementReturnDto>(data);
+            result.Product = await _productService.Get(data.ProductId);
+            result.Responsible = await _accountService.Get(data.ResponsibleId);
+            result.Segment = await _handbookService.Get(data.SegmentId, nameof(WorkshopSegment));
+            IList<HandbookEntityReturnDto> allDefects = await _handbookService.GetAll(nameof(Defect));
+            result.Defects = data.Defects.Select(d => new WebStatementDefectReturnDto
+            {
+                DefectName = allDefects.First(he => he.Id == d.DefectId).Name,
+                Size = d.Size
+            }).ToList();
+
+            return result;
+        }
+
+        private async Task<IList<WebStatementReturnDto>> Convert(IList<StatementReturnDto> list)
+        {
+            IList<ProductReturnDto> products = await _productService.GetAll();
+            IList<AccountReturnDto> employees = await _accountService.GetAll(ClientRoles.Employee);
+            IList<HandbookEntityReturnDto> segments = await _handbookService.GetAll(nameof(WorkshopSegment));
+            IList<HandbookEntityReturnDto> defects = await _handbookService.GetAll(nameof(Defect));
+            List<WebStatementReturnDto> result = new();
+
+            foreach (var statement in list)
+            {
+                WebStatementReturnDto webStatement  = _mapper.Map<WebStatementReturnDto>(statement);
+                webStatement.Product = products.First(p => p.Id == statement.ProductId);
+                webStatement.Responsible = employees.First(e => e.Id == statement.ResponsibleId);
+                webStatement.Segment = segments.First(segment => segment.Id == statement.SegmentId);
+                webStatement.Defects = statement.Defects.Select(d => new WebStatementDefectReturnDto
+                {
+                    DefectName = defects.First(he => he.Id == d.DefectId).Name,
+                    Size = d.Size
+                }).ToList();
+                result.Add(webStatement);
+            }
+
+            return result;
         }
 
         public async Task<WebStatementReturnDto?> Get(Guid id)
         {
-            return Statements.Find(s => s.Id == id);
+            HttpResponseMessage response = await Http.GetAsync($"Statement/Get/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            StatementReturnDto data = await response.FromContent<StatementReturnDto>();
+
+            return await Convert(data);
         }
 
-        public async Task<IList<WebStatementReturnDto>> GetAll(Guid employeeId, DateTime date)
+        public Task<IList<WebStatementReturnDto>> GetAll(Guid employeeId, DateTime date)
         {
-            return new List<WebStatementReturnDto> { Statements[1] };
+            return GetAll(null, employeeId, date);
         }
 
-        public async Task<IList<WebStatementReturnDto>> GetAll(int segmentId, DateTime date)
+        public Task<IList<WebStatementReturnDto>> GetAll(int segmentId, DateTime date)
         {
-            return Statements;
+            return GetAll(segmentId, null, date);
         }
 
-        public async Task<IList<WebStatementReturnDto>> GetAll(int segmentId, DateTime date, Guid employeeId)
+        public Task<IList<WebStatementReturnDto>> GetAll(int segmentId, DateTime date, Guid employeeId)
         {
-            return new List<WebStatementReturnDto> { Statements[0] };
+            return GetAll(segmentId, employeeId, date);
+        }
+
+        public async Task<IList<WebStatementReturnDto>> GetAll(int? segmentId, Guid? employeeId, DateTime date)
+        {
+            StatementGetDto data = new() { EmployeeId = employeeId, Date = date, SegmentId = segmentId };
+            HttpResponseMessage response = await Http.PostAsync("Statement/FindForEmployee", data.ToJsonContent());
+
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                response = await Http.PostAsync("Statement/FindForAdmin", data.ToJsonContent());
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<WebStatementReturnDto>();
+            }
+
+            IList<StatementReturnDto> result = await response.FromContent<IList<StatementReturnDto>>();
+
+            return await Convert(result);
         }
 
         public async Task<WebStatementReturnDto> Create(WebStatementCreateDto data)
         {
-            _logger.LogInformation("Создана ведомость: {data}", data.ToJson());
+            StatementCreateDto createDto = _mapper.Map<StatementCreateDto>(data);
+            IList<WebStatementDefectReturnDto> defects = data.DefectsJson.FromJson<IList<WebStatementDefectReturnDto>>();
+            IList<HandbookEntityReturnDto> allDefects = await _handbookService.GetAll(nameof(Defect));
+            createDto.Defects = defects.Select(d => new StatementDefectReturnDto
+            {
+                DefectId = allDefects.First(he => he.Name == d.DefectName).Id,
+                Size = d.Size
+            }).ToList();
 
-            return Statements[0];
+            return await TryResult(
+                action: async () =>
+            {
+                HttpResponseMessage response = await Http.PostAsync("Statement/Create", createDto.ToJsonContent());
+                response.ThrowIfUnsuccess();
+                StatementReturnDto result = await response.FromContent<StatementReturnDto>();
+
+                return await Convert(result);
+            },
+            unseccessHandler: (data) => data.Message);
         }
 
-        public async Task<WebStatementReturnDto> Delete(Guid id)
+        public Task<WebStatementReturnDto> Delete(Guid id)
         {
-            return Statements.Find(s => s.Id == id);
+            return TryResult(
+            action: async () =>
+            {
+                HttpResponseMessage response = await Http.DeleteAsync($"Statement/Delete/{id}");
+                response.ThrowIfUnsuccess();
+                StatementReturnDto result = await response.FromContent<StatementReturnDto>();
+
+                return await Convert(result);
+            },
+            unseccessHandler: (data) => data.Message);
         }
     }
 }

@@ -1,7 +1,11 @@
 ﻿using System.Security.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using RBP.Services.Dto;
+using RBP.Services.Models;
 using RBP.Services.Static;
+using RBP.Services.Utils;
 using RBP.Web.Models;
+using RBP.Web.Services;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
 
@@ -17,6 +21,20 @@ namespace RBP.Web.Controllers
             _logger = logger;
             _accountService = accountService;
             _accountService.Client = this;
+        }
+
+        [NonAction]
+        protected async Task Login(string phone, string password)
+        {
+            ApiSecrets? apiData = await _accountService.Login(phone, password);
+
+            if (apiData is null)
+            {
+                throw new AuthenticationException();
+            }
+
+            SetApiData(apiData);
+            await SetClientData(apiData.Account);
         }
 
         public IActionResult Login()
@@ -49,14 +67,15 @@ namespace RBP.Web.Controllers
             }
         }
 
-        new public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout()
         {
             if (await IsAuthorized() == false)
             {
                 return RedirectUnauthorizedAction();
             }
 
-            await base.Logout();
+            SetApiData(null);
+            await SetClientData(null);
 
             return RedirectToLogin();
         }

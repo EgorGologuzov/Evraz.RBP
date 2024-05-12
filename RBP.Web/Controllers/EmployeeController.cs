@@ -57,6 +57,12 @@ namespace RBP.Web.Controllers
             return new EmployeeViewModel(title, GetClientData(), data, await _handbookService.GetAllSegments());
         }
 
+        [NonAction]
+        private async Task<AccountSecretsViewModel> BuildViewModel(string title, AccountSecrets secrets)
+        {
+            return new AccountSecretsViewModel(title, GetClientData(), secrets);
+        }
+
         public async Task<IActionResult> Index(string? searchRequest)
         {
             if (await IsAuthorized(ClientRoles.Admin) == false)
@@ -97,9 +103,10 @@ namespace RBP.Web.Controllers
 
             try
             {
-                AccountReturnDto result = await _accountService.CreateEmployee(data);
+                AccountSecrets result = await _accountService.CreateEmployee(data);
+                AccountSecretsViewModel model = await BuildViewModel("Создан аккаунт", result);
 
-                return Redirect("/Employee/Index");
+                return View("~/Views/Account/Secrets.cshtml", model);
             }
             catch (NotOkResponseException ex)
             {

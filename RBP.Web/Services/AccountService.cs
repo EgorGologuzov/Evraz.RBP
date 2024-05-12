@@ -4,72 +4,40 @@ using RBP.Services.Models;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
 using RBP.Services.Static;
+using System.Xml.Linq;
+using AutoMapper;
+using RBP.Services.Exceptions;
+using RBP.Web.Properties;
 
 namespace RBP.Web.Services
 {
     public class AccountService : ApiServiceBase, IAccountService
     {
-        public static List<AccountReturnDto> Accounts = new()
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Phone = "1111111111",
-                Name = "Иванов Иван Иванович",
-                Role = ClientRoles.Employee,
-                CreationTime = DateTime.Now - TimeSpan.FromHours(10),
-                Comment = "Comment text",
-                IsActive = true,
-                RoleDataJson = new EmployeeRoleData
-                {
-                    SegmentId = 1,
-                    Gender = "М",
-                    BirthDate = DateTime.Now - TimeSpan.FromDays(365 * 30),
-                    EmploymentDate = DateTime.Now - TimeSpan.FromDays(365 * 10)
-                }.ToJson()
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Phone = "2222222222",
-                Name = "Федотов Федот Федотович",
-                Role = ClientRoles.Admin,
-                CreationTime = DateTime.Now - TimeSpan.FromHours(10),
-                IsActive = true,
-                RoleDataJson = new AdminRoleData
-                {
-                    JobTitle = "Начальник цеха"
-                }.ToJson(),
-                Comment = "Самый главный в цехе"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Phone = "3333333333",
-                Name = "Ахматова Галина Николаевна",
-                Role = ClientRoles.Employee,
-                CreationTime = DateTime.Now - TimeSpan.FromHours(10),
-                IsActive = false,
-                RoleDataJson = new EmployeeRoleData
-                {
-                    SegmentId = 3,
-                    Gender = "Ж",
-                    BirthDate = DateTime.Now - TimeSpan.FromDays(365 * 35),
-                    EmploymentDate = DateTime.Now - TimeSpan.FromDays(365 * 4)
-                }.ToJson()
-            }
-        };
+        private readonly IMapper _mapper;
 
-        private readonly ILogger<AccountService> _logger;
-
-        public AccountService(ILogger<AccountService> logger)
+        public AccountService(HttpClient client, ILogger<AccountService> logger, IMapper mapper) : base(client, logger)
         {
-            _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<AccountReturnDto?> Get(Guid id)
         {
-            return Accounts.Find(a => a.Id == id);
+            HttpResponseMessage response = await Http.GetAsync($"Account/Get/{id}");
+
+            return response.IsSuccessStatusCode ? await response.FromContent<AccountReturnDto>() : null;
+        }
+
+        public async Task<ApiSecrets?> Login(string phone, string password)
+        {
+            AccountSecrets data = new()
+            {
+                Phone = phone,
+                Password = password
+            };
+
+            HttpResponseMessage response = await Http.PostAsync("Auth/Login", data.ToJsonContent());
+
+            return response.IsSuccessStatusCode ? await response.FromContent<ApiSecrets>() : null;
         }
 
         public async Task<IList<AccountReturnDto>> Find(string? name, string role)
@@ -79,82 +47,125 @@ namespace RBP.Web.Services
                 return await GetAll(role);
             }
 
-            return Accounts.Where(a => a.Name.Contains(name) && a.Role == role).ToList();
+            HttpResponseMessage response = await Http.GetAsync($"Account/Find/{role}/{name}");
+
+            return response.IsSuccessStatusCode ? await response.FromContent<IList<AccountReturnDto>>() : new List<AccountReturnDto>();
         }
 
         public async Task<IList<AccountReturnDto>> GetAll(string role)
         {
-            return Accounts.Where(a => a.Role == role).ToList();
+            HttpResponseMessage response = await Http.GetAsync($"Account/GetAll/{role}");
+
+            return response.IsSuccessStatusCode ? await response.FromContent<IList<AccountReturnDto>>() : new List<AccountReturnDto>();
         }
 
-        public async Task<AccountReturnDto> CreateEmployee(EmployeeCreateDto data)
+        public Task<AccountSecrets> CreateEmployee(EmployeeCreateDto data)
         {
-            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
+            EmployeeRoleData roleData = _mapper.Map<EmployeeRoleData>(data);
+            AccountCreateDto accountData = _mapper.Map<AccountCreateDto>(data);
+            accountData.Role = ClientRoles.Employee;
+            accountData.RoleDataJson = roleData.ToJson();
 
-            if (account is not null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Аккаунт с таким номером уже существует");
-            }
+                HttpResponseMessage response = await Http.PostAsync("Account/Create", accountData.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Создан сотрудник: {data}", data.ToJson());
-
-            return Accounts[0];
+                return await response.FromContent<AccountSecrets>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Аккаунт с таким телефоном уже существует" : data.Message);
         }
 
-        public async Task<AccountReturnDto> UpdateEmployee(EmployeeUpdateDto data)
+        public Task<AccountReturnDto> UpdateEmployee(EmployeeUpdateDto data)
         {
-            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
+            EmployeeRoleData roleData = _mapper.Map<EmployeeRoleData>(data);
+            AccountUpdateDto accountData = _mapper.Map<AccountUpdateDto>(data);
+            accountData.RoleDataJson = roleData.ToJson();
 
-            if (account is null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Аккаунт с таким номером не существует");
-            }
+                HttpResponseMessage response = await Http.PutAsync("Account/Update", accountData.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Обновлены данные сотрудника: {data}", data.ToJson());
-
-            return Accounts.Find(a => a.Id == data.Id);
+                return await response.FromContent<AccountReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Аккаунт с таким телефоном уже существует" : data.Message);
         }
 
-        public async Task<AccountReturnDto> CreateAdmin(AdminCreateDto data)
+        public Task<AccountSecrets> CreateAdmin(AdminCreateDto data)
         {
-            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
+            AdminRoleData roleData = _mapper.Map<AdminRoleData>(data);
+            AccountCreateDto accountData = _mapper.Map<AccountCreateDto>(data);
+            accountData.Role = ClientRoles.Admin;
+            accountData.RoleDataJson = roleData.ToJson();
 
-            if (account is not null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Аккаунт с таким номером уже существует");
-            }
+                HttpResponseMessage response = await Http.PostAsync("Account/Create", accountData.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Создан администратор: {data}", data.ToJson());
-
-            return Accounts[0];
+                return await response.FromContent<AccountSecrets>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Аккаунт с таким телефоном уже существует" : data.Message);
         }
 
-        public async Task<AccountReturnDto> UpdateAdmin(AdminUpdateDto data)
+        public Task<AccountReturnDto> UpdateAdmin(AdminUpdateDto data)
         {
-            AccountReturnDto? account = Accounts.Find(a => a.Phone == data.Phone);
+            AdminRoleData roleData = _mapper.Map<AdminRoleData>(data);
+            AccountUpdateDto accountData = _mapper.Map<AccountUpdateDto>(data);
+            accountData.RoleDataJson = roleData.ToJson();
 
-            if (account is null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Аккаунт с таким номером не существует");
-            }
+                HttpResponseMessage response = await Http.PutAsync("Account/Update", accountData.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Обновлены данные администратора: {data}", data.ToJson());
-
-            return Accounts.Find(a => a.Id == data.Id);
+                return await response.FromContent<AccountReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Аккаунт с таким телефоном уже существует" : data.Message);
         }
 
-        public async Task<bool> ResetPassword(Guid userId, string newPassword)
+        public async Task ResetPassword(Guid userId, string newPassword)
         {
-            _logger.LogInformation("Сброшен пароль аккаунта: {id}", userId);
+            PasswordResetDto data = new()
+            {
+                AccountId = userId,
+                NewPassword = newPassword
+            };
 
-            return true;
+            await TryResult<object>(
+            action: async () =>
+            {
+                HttpResponseMessage response = await Http.PutAsync("Account/ResetPassword", data.ToJsonContent());
+                response.ThrowIfUnsuccess();
+
+                return null;
+            },
+            unseccessHandler: (data) => data.Message);
         }
 
-        public async Task<bool> UpdatePassword(Guid userId, string oldPassword, string newPassword)
+        public async Task UpdatePassword(Guid userId, string oldPassword, string newPassword)
         {
-            _logger.LogInformation("Обновлен пароль аккаунта: {id}", userId);
+            PasswordResetDto data = new()
+            {
+                AccountId = userId,
+                NewPassword = newPassword,
+                OldPassword = oldPassword
+            };
 
-            return true;
+            await TryResult<object>(
+            action: async () =>
+            {
+                HttpResponseMessage response = await Http.PutAsync("Account/UpdatePassword", data.ToJsonContent());
+                response.ThrowIfUnsuccess();
+
+                return null;
+            },
+            unseccessHandler: (data) => data.Message);
         }
     }
 }

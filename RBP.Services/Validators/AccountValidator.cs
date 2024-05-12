@@ -18,9 +18,9 @@ namespace RBP.Services.Validators
 
         public override void Validate(Account entity)
         {
-            entity.Phone.CheckMatch(ValidationSettings.PhonePattern, nameof(entity.Phone));
+            entity.Phone.CheckMatch(ValidationSettings.PhonePattern, nameof(entity.Phone), "Некорректный формат телефона");
             entity.PasswordHash.CheckLength(ValidationSettings.PasswordHashLength, ValidationSettings.PasswordHashLength, nameof(entity.PasswordHash));
-            entity.Name.CheckMatch(ValidationSettings.FioPattern, nameof(entity.Name));
+            entity.Name.CheckMatch(ValidationSettings.FioPattern, nameof(entity.Name), "Некорректный формат телефона");
             entity.Role.CheckContains(ClientRoles.AllRoles, nameof(entity.Role));
             entity.CreationTime.CheckRange(ValidationSettings.SystemStartDay, DateTime.Now, nameof(entity.CreationTime));
             entity.Comment.CheckLength(0, ValidationSettings.MaxCommentLength, nameof(entity.Comment));

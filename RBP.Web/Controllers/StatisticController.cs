@@ -70,7 +70,7 @@ namespace RBP.Web.Controllers
             }
             catch(NotOkResponseException ex)
             {
-                SegmentStatisticViewModel model = await BuildViewModel("Статистика", new StatisticData(), start.Value, end.Value);
+                SegmentStatisticViewModel model = await BuildViewModel("Статистика", new StatisticData { SegmentId = segmentId }, start.Value, end.Value);
                 model.ErrorMessage = ex.Message;
 
                 return View(model);

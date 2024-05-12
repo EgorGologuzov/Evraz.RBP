@@ -4,154 +4,79 @@ using RBP.Services.Models;
 using RBP.Services.Static;
 using RBP.Web.Services.Interfaces;
 using RBP.Web.Utils;
+using RBP.Web.Properties;
+using RBP.Services.Exceptions;
 
 namespace RBP.Web.Services
 {
     public class HandbookService : ApiServiceBase, IHandbookService
     {
-        public static readonly Dictionary<string, List<HandbookEntityReturnDto>> Handbooks = new()
+        public HandbookService(HttpClient client, ILogger<HandbookService> logger) : base(client, logger)
         {
-            {
-                "RailProfile",
-                new()
-                {
-                    new()
-                    {
-                        Id = 1,
-                        Name = "Т58",
-                        Comment = "Рельс трамвайный"
-                    },
-                    new()
-                    {
-                        Id = 2,
-                        Name = "Р65",
-                        Comment = "Рельс железнодорожный"
-                    },
-                }
-            },
-            {
-                "Defect",
-                new()
-                {
-                    new()
-                    {
-                        Id = 1,
-                        Name = "Скол",
-                        Comment = "Нарушение геометричесокй формы профиля с острыми краями диаметром более 2 мм."
-                    },
-                    new()
-                    {
-                        Id = 2,
-                        Name = "Трещина",
-                        Comment = "Области с полностью нарушенными межатомными связями и частично нарушенными межатомными связями."
-                    },
-                }
-            },
-            {
-                "SteelGrade",
-                new()
-                {
-                    new()
-                    {
-                        Id = 1,
-                        Name = "ГОСТ 1050-2013",
-                        Comment = ""
-                    },
-                    new()
-                    {
-                        Id = 2,
-                        Name = "ГОСТ 1050-88"
-                    },
-                }
-            },
-            {
-                "WorkshopSegment",
-                new()
-                {
-                    new()
-                    {
-                        Id = 1,
-                        Name = "Разгрузка поставок - Приемка"
-                    },
-                    new()
-                    {
-                        Id = 2,
-                        Name = "Разгрузка поставок - Склад"
-                    },
-                    new()
-                    {
-                        Id = 3,
-                        Name = "Печь - Приемка"
-                    },
-                }
-            },
-        };
-        
-        private readonly ILogger<HandbookService> _logger;
-
-        public HandbookService(ILogger<HandbookService> logger)
-        {
-            _logger = logger;
         }
 
-        public async Task<HandbookEntityReturnDto?> Get(int id, string handbook) => Handbooks[handbook].Find(e => e.Id == id);
+        public async Task<IList<Handbook>> GetAll() => Handbooks.Config;
+        public async Task<Handbook> GetSegmentsHandbook() => Handbooks.Config.Find(h => h.Name == nameof(WorkshopSegment));
 
-        public async Task<IList<Handbook>> GetAll() => Properties.Handbooks.Config;
-
-        public async Task<Handbook> GetSegmentsHandbook() => Properties.Handbooks.Config.Find(h => h.Name == "WorkshopSegment");
-
-        public async Task<IList<HandbookEntityReturnDto>> GetAll(string handbookName) => Handbooks[handbookName];
-
-        public async Task<IList<HandbookEntityReturnDto>> GetAllSegments() => Handbooks["WorkshopSegment"];
-
-        public async Task<IList<HandbookEntityReturnDto>> GetAllSteels() => Handbooks["SteelGrade"];
-
-        public async Task<IList<HandbookEntityReturnDto>> GetAllProfiles() => Handbooks["RailProfile"];
-
-        public async Task<IList<HandbookEntityReturnDto>> GetAllDefects() => Handbooks["Defect"];
-
-        public async Task<HandbookEntityReturnDto> Create(HandbookEntityCreateDto data)
+        public async Task<HandbookEntityReturnDto?> Get(int id, string handbook)
         {
-            if (Handbooks.ContainsKey(data.HandbookName) == false || Handbooks[data.HandbookName].Find(e => e.Name == data.Name) is not null)
-            {
-                throw new NotOkResponseException("Уже существует сущность с такими именем");
-            }
+            HttpResponseMessage response = await Http.GetAsync($"Handbook/Get/{handbook}/{id}");
 
-            _logger.LogInformation("Создан новый элемент справочника {data}", data.ToJson());
-
-            return Handbooks[data.HandbookName][0];
+            return response.IsSuccessStatusCode ? await response.FromContent<HandbookEntityReturnDto>() : null;
         }
 
-        public async Task<HandbookEntityReturnDto> Update(HandbookEntityUpdateDto data)
+        public async Task<IList<HandbookEntityReturnDto>> GetAll(string handbookName)
         {
-            if (Handbooks.ContainsKey(data.HandbookName) == false || Handbooks[data.HandbookName].Find(e => e.Id == data.Id) is null)
-            {
-                throw new NotOkResponseException("Не найдена сущность с такими параметрами");
-            }
+            HttpResponseMessage response = await Http.GetAsync($"Handbook/GetAll/{handbookName}");
 
-            _logger.LogInformation("Обновлен справочник {data}", data.ToJson());
-
-            return Handbooks[data.HandbookName].Find(e => e.Id == data.Id);
+            return response.IsSuccessStatusCode ? await response.FromContent<IList<HandbookEntityReturnDto>>() : new List<HandbookEntityReturnDto>();
         }
 
-        public async Task<HandbookEntityReturnDto> Delete(int id, string handbook)
+        public Task<IList<HandbookEntityReturnDto>> GetAllSegments() => GetAll(nameof(WorkshopSegment));
+
+        public Task<IList<HandbookEntityReturnDto>> GetAllSteels() => GetAll(nameof(SteelGrade));
+
+        public Task<IList<HandbookEntityReturnDto>> GetAllProfiles() => GetAll(nameof(RailProfile));
+
+        public Task<IList<HandbookEntityReturnDto>> GetAllDefects() => GetAll(nameof(Defect));
+
+        public Task<HandbookEntityReturnDto> Create(HandbookEntityCreateDto data)
         {
-            HandbookEntityReturnDto? entity = await Get(id, handbook);
-
-            if (entity is null)
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Элемента нет в справочнике");
-            }
+                HttpResponseMessage response = await Http.PostAsync("Handbook/Create", data.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            if (handbook == "WorkshopSegment" &&
-                AccountService.Accounts.Find(a => a.RoleDataJson is not null && a.RoleDataJson.FromJson<EmployeeRoleData>().SegmentId == id) is not null)
+                return await response.FromContent<HandbookEntityReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Сущность с таким именем уже существует" : null);
+        }
+
+        public Task<HandbookEntityReturnDto> Update(HandbookEntityUpdateDto data)
+        {
+            return TryResult(
+            action: async () =>
             {
-                throw new NotOkResponseException("Элемент справочника уже используется, его нельзя удалить");
-            }
+                HttpResponseMessage response = await Http.PutAsync("Handbook/Update", data.ToJsonContent());
+                response.ThrowIfUnsuccess();
 
-            _logger.LogInformation("Удален элемент справочника {id}, {handbook}", id, handbook);
+                return await response.FromContent<HandbookEntityReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Сущность с таким именем уже существует" : null);
+        }
 
-            return entity;
+        public Task<HandbookEntityReturnDto> Delete(int id, string handbook)
+        {
+            return TryResult(
+            action: async () =>
+            {
+                HttpResponseMessage response = await Http.DeleteAsync($"Handbook/Delete/{handbook}/{id}");
+                response.ThrowIfUnsuccess();
+
+                return await response.FromContent<HandbookEntityReturnDto>();
+            },
+            unseccessHandler: (data) => data.Exception == nameof(UniquenessViolationException) ? "Сущность нельзя удалить пока существуют связанные сущности" : null);
         }
     }
 }

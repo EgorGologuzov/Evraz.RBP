@@ -140,7 +140,7 @@ namespace RBP.Web.Controllers
             {
                 WebStatementReturnDto result = await _statementService.Create(data);
 
-                return RedirectToAction(nameof(List), new { data.SegmentId, Date = DateTime.Now });
+                return RedirectToAction(nameof(EmployeeList), new { EmployeeId = GetClientData().Id, Date = DateTime.Now });
             }
             catch (NotOkResponseException ex)
             {
@@ -277,11 +277,13 @@ namespace RBP.Web.Controllers
             Task<IList<HandbookEntityReturnDto>> allSegments = _handbookService.GetAllSegments();
 
             await Task.WhenAll(allProducts, allEmployees, allDefects, allSegments);
+            WebStatementReturnDto statement = _mapper.Map<WebStatementReturnDto>(data);
+            statement.Defects = data.DefectsJson.FromJson<IList<WebStatementDefectReturnDto>>();
 
             return new StatementViewModel(
                 pageTitle: title,
                 client: GetClientData(),
-                statement: _mapper.Map<WebStatementReturnDto>(data),
+                statement: statement,
                 allProducts: allProducts.Result,
                 allEmployees: allEmployees.Result,
                 allDefects: allDefects.Result,

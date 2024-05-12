@@ -30,7 +30,7 @@ namespace RBP.Web.Controllers
 
             if (ClientInRole(ClientRoles.Employee))
             {
-                return Redirect($"/Statement/EmployeeList?EmployeeId={GetClientData().Id}&Date={DateTime.Now}");
+                return Redirect($"/Statement/EmployeeList?EmployeeId={GetClientData().Id}&Date={DateTime.Now.ToString("yyyy-MM-dd")}");
             }
             else if (ClientInRole(ClientRoles.Admin))
             {

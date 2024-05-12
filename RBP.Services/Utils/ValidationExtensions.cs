@@ -126,5 +126,24 @@ namespace RBP.Services.Utils
                 throw new InvalidFieldValueException(fieldName, message ?? "Значение не равно заданному");
             }
         }
+
+        public static void CheckUnique<T>(this IList<T> list, Func<T, T, bool> comparator, string fieldName, string message = null)
+        {
+            if (list is null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    if (comparator(list[i], list[j]))
+                    {
+                        throw new InvalidFieldValueException(fieldName, message ?? "Нарушение ограничения уникальности");
+                    }
+                }
+            }
+        }
     }
 }

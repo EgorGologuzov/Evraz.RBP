@@ -2,7 +2,7 @@
 {
     public class StatisticData
     {
-        public int SegmentId { get; set; }
+        public int? SegmentId { get; set; }
         public IEnumerable<DateIntPare> AcceptedWeightDynamic { get; set; }
         public IEnumerable<DateIntPare> ShippedWeightDynamic { get; set; }
         public IEnumerable<DateIntPare> WeightInStorageDynamic { get; set; }

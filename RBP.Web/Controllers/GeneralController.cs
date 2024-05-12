@@ -24,7 +24,11 @@ namespace RBP.Web.Controllers
         private ApiSecrets? _apiData;
         private Func<IActionResult> _unauthorizedAction;
 
-        public ApiSecrets? ApiData => GetApiData();
+        public ApiSecrets? ApiData
+        {
+            get => GetApiData();
+            set => SetApiData(value);
+        }
 
         [NonAction]
         protected AccountReturnDto? GetClientData()
@@ -120,27 +124,6 @@ namespace RBP.Web.Controllers
         }
 
         [NonAction]
-        protected async Task Login(string phone, string password)
-        {
-            AccountReturnDto? accountData = AccountService.Accounts.Find(a => a.Phone == phone && !string.IsNullOrEmpty(password));
-
-            if (accountData is null)
-            {
-                throw new AuthenticationException();
-            }
-
-            ApiSecrets apiData = new()
-            {
-                Token = "test-token",
-                TokenExpirationTime = DateTime.Now + TimeSpan.FromHours(1),
-                RecommendedRefreshTokenTime = DateTime.Now + TimeSpan.FromHours(0.5)
-            };
-
-            SetApiData(apiData);
-            await SetClientData(accountData);
-        }
-
-        [NonAction]
         protected async Task<bool> IsAuthorized(params string[] roles)
         {
             if (GetClientData() is null || GetApiData() is null)
@@ -155,31 +138,13 @@ namespace RBP.Web.Controllers
                 return false;
             }
 
-            if (GetApiData().TokenExpirationTime <= DateTime.Now)
+            if (GetApiData().TokenExpirationTime <= DateTime.UtcNow.AddMinutes(-1))
             {
                 _unauthorizedAction = RedirectToLogin;
                 return false;
             }
 
-            if (GetApiData().RecommendedRefreshTokenTime <= DateTime.Now)
-            {
-                await RefreshToken();
-            }
-
             return true;
-        }
-
-        [NonAction]
-        protected async Task RefreshToken()
-        {
-            ApiSecrets data = new()
-            {
-                Token = "test-token",
-                TokenExpirationTime = DateTime.Now + TimeSpan.FromHours(1),
-                RecommendedRefreshTokenTime = DateTime.Now + TimeSpan.FromHours(0.5)
-            };
-
-            SetApiData(data);
         }
 
         [NonAction]
@@ -190,13 +155,6 @@ namespace RBP.Web.Controllers
 
         [NonAction]
         protected IActionResult RedirectToForbiden() => NotFoundPage("Вам не доступно это действие.");
-
-        [NonAction]
-        protected async Task Logout()
-        {
-            SetApiData(null);
-            await SetClientData(null);
-        }
 
         [NonAction]
         protected IActionResult NotFoundPage(string? message = "Страница не найдена.")

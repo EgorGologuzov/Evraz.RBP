@@ -21,7 +21,7 @@ namespace RBP.Db.Repositories
             Logger = logger;
         }
 
-        private async Task<IEnumerable<StringIntPare>> ProductGroupedWeight(
+        private async Task<IList<StringIntPare>> ProductGroupedWeight(
             StatementType? type = null,
             int? segmentId = null,
             DateTime? start = null,
@@ -38,7 +38,7 @@ namespace RBP.Db.Repositories
                 .ToListAsync();
         }
 
-        private async Task<IEnumerable<DateIntPare>> DateGroupedWeight(
+        private async Task<IList<DateIntPare>> DateGroupedWeight(
             StatementType? type = null,
             int? segmentId = null,
             DateTime? start = null,
@@ -54,19 +54,21 @@ namespace RBP.Db.Repositories
                 .ToListAsync();
         }
 
-        private async Task<IEnumerable<StringIntPare>> ProductWeightInStoragePer(int? segmentId, DateTime date)
+        private async Task<IList<StringIntPare>> ProductWeightInStoragePer(int? segmentId, DateTime date)
         {
+            date = date.Date.AddDays(1);
+
             return await Context.Statements
                 .Where(s => (s.Type == StatementType.Storage || s.Type == StatementType.Transfer)
                     && (segmentId == null || s.SegmentId == segmentId)
-                    && s.Date <= date)
+                    && s.Date < date)
                 .Include(s => s.Product)
                 .GroupBy(s => s.Product.Name)
                 .Select(g => new StringIntPare(g.Key, g.Sum(s => s.Type == StatementType.Storage ? s.Weight : -s.Weight)))
                 .ToListAsync();
         }
 
-        private async Task<IEnumerable<StringIntPare>> DefectedProductsInStoragePer(int? segmentId, DateTime date)
+        private async Task<IList<StringIntPare>> DefectedProductsInStoragePer(int? segmentId, DateTime date)
         {
             return await Context.Statements
                 .Include(s => s.Defects)
@@ -80,18 +82,26 @@ namespace RBP.Db.Repositories
                 .ToListAsync();
         }
 
-        private async Task<IEnumerable<DateIntPare>> WeightInStorageDynamic(int? segmentId, DateTime start, DateTime end)
+        private async Task<IList<DateIntPare>> WeightInStorageDynamic(int? segmentId, DateTime start, DateTime end)
         {
+            start = start.Date;
+            end = end.Date;
+            DateTime startNextDay = start.AddDays(1);
+
             int startWeight = (await ProductWeightInStoragePer(segmentId, start)).Sum(p => p.Value);
 
-            return await Context.Statements
+            List<DateIntPare> result = await Context.Statements
                 .Where(s => (s.Type == StatementType.Storage || s.Type == StatementType.Transfer)
                     && (segmentId == null || s.SegmentId == segmentId)
-                    && (s.Date >= start)
-                    && (s.Date <= end))
+                    && (s.Date >= startNextDay)
+                    && (s.Date < end))
                 .GroupBy(s => s.Date.Date)
                 .Select(g => new DateIntPare(g.Key, g.Sum(s => s.Type == StatementType.Storage ? s.Weight : -s.Weight) + startWeight))
                 .ToListAsync();
+
+            result.Add(new DateIntPare(start, startWeight));
+
+            return result;
         }
 
         public async Task<StatisticData> GetSegmentStatistic(int segmentId, DateTime start, DateTime end)
@@ -99,10 +109,9 @@ namespace RBP.Db.Repositories
             start.CheckNotGreater(end, nameof(start));
 
             DateTime max = await Context.Statements.Where(s => s.SegmentId == segmentId).MaxAsync(s => s.Date);
-            end = LogicUtils.Min(end, max);
-            start = start.StripSeconds();
-            end = end.StripSeconds();
-            string key = $"{start}_{end}_{segmentId}";
+            DateTime startDate = start.StripSeconds();
+            DateTime endDate = LogicUtils.Min(end, max).StripSeconds();
+            string key = $"{startDate}_{endDate}_{segmentId}";
             StatisticData? result = _segmentCash.Get(key);
 
             if (result is not null)
@@ -113,13 +122,13 @@ namespace RBP.Db.Repositories
             result = new StatisticData
             {
                 SegmentId = segmentId,
-                AcceptedWeightDynamic = await DateGroupedWeight(StatementType.Accept, segmentId, start, end),
-                ShippedWeightDynamic = await DateGroupedWeight(StatementType.Shipment, segmentId, start, end),
-                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, segmentId, start, end),
-                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, segmentId, start, end),
-                ProductsInStorageNow = await ProductWeightInStoragePer(segmentId, end),
-                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(segmentId, end),
-                WeightInStorageDynamic = await WeightInStorageDynamic(segmentId, start, end)
+                AcceptedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Accept, segmentId, startDate, endDate), start, end),
+                ShippedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Shipment, segmentId, startDate, endDate), start, end),
+                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, segmentId, startDate, endDate),
+                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, segmentId, startDate, endDate),
+                ProductsInStorageNow = await ProductWeightInStoragePer(segmentId, endDate),
+                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(segmentId, endDate),
+                WeightInStorageDynamic = LogicUtils.FillFullListPreviosValues(await WeightInStorageDynamic(segmentId, startDate, endDate), start, end)
             };
 
             _segmentCash.Set(key, result);
@@ -132,10 +141,9 @@ namespace RBP.Db.Repositories
             start.CheckNotGreater(end, nameof(start));
 
             DateTime max = await Context.Statements.MaxAsync(s => s.Date);
-            end = LogicUtils.Min(end, max);
-            start = start.StripSeconds();
-            end = end.StripSeconds();
-            string key = $"{start}_{end}";
+            DateTime startDate = start.StripSeconds();
+            DateTime endDate = LogicUtils.Min(end, max).StripSeconds();
+            string key = $"{startDate}_{endDate}";
             StatisticData? result = _workshopCash.Get(key);
 
             if (result is not null)
@@ -145,13 +153,13 @@ namespace RBP.Db.Repositories
 
             result = new StatisticData
             {
-                AcceptedWeightDynamic = await DateGroupedWeight(StatementType.Accept, null, start, end),
-                ShippedWeightDynamic = await DateGroupedWeight(StatementType.Shipment, null, start, end),
-                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, null, start, end),
-                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, null, start, end),
-                ProductsInStorageNow = await ProductWeightInStoragePer(null, end),
-                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(null, end),
-                WeightInStorageDynamic = await WeightInStorageDynamic(null, start, end)
+                AcceptedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Accept, null, startDate, endDate), start, end),
+                ShippedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Shipment, null, startDate, endDate), start, end),
+                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, null, startDate, endDate),
+                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, null, startDate, endDate),
+                ProductsInStorageNow = await ProductWeightInStoragePer(null, endDate),
+                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(null, endDate),
+                WeightInStorageDynamic = LogicUtils.FillFullListPreviosValues(await WeightInStorageDynamic(null, startDate, endDate), start, end)
             };
 
             _workshopCash.Set(key, result);
