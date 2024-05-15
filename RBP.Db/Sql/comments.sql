@@ -2,5 +2,5 @@ UPDATE public."Statements"
 	SET "Comment" = NULL;
 
 UPDATE public."Statements" AS s
-	SET "Comment" = 'Есть деффекты'
+	SET "Comment" = 'Р•СЃС‚СЊ РґРµС„С„РµРєС‚С‹'
 	WHERE (SELECT COUNT(*) FROM public."StatementDefects" WHERE "StatementId" = s."Id") <> 0;
