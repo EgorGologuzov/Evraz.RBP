@@ -68,7 +68,7 @@ builder.Services.AddDbContext<PostgresContext>();
 
 WebApplication app = builder.Build();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // ... подключение авторизации
 app.UseAuthentication();
