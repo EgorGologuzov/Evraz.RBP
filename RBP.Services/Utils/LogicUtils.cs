@@ -18,7 +18,7 @@ namespace RBP.Services.Utils
         {
             List<DateIntPare> updatedList = new();
 
-            for (DateTime date = start; date <= end; date = date.AddDays(1))
+            for (DateTime date = start; date < end; date = date.AddDays(1))
             {
                 DateIntPare existing = list.FirstOrDefault(p => p.Key.Date == date.Date);
 
@@ -41,7 +41,7 @@ namespace RBP.Services.Utils
         {
             List<DateIntPare> updatedList = new();
 
-            for (DateTime date = start; date <= end; date = date.AddDays(1))
+            for (DateTime date = start; date < end; date = date.AddDays(1))
             {
                 DateIntPare existing = list.FirstOrDefault(p => p.Key.Date == date.Date);
 

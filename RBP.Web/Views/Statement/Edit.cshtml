@@ -67,7 +67,7 @@
                 @Html.AdaptiveSelect(
                         name: nameof(Model.Statement.Type),
                         label: "Тип",
-                        value: Model.Statement.Type.ToString(),
+                        value: ((int)Model.Statement.Type).ToString(),
                         items: Model.StatementTypesNames.Select(t => KeyValuePair.Create(t.Value, ((int)t.Key).ToString())),
                         isEnabled: false
                         )

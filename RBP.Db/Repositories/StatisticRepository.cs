@@ -108,63 +108,39 @@ namespace RBP.Db.Repositories
         {
             start.CheckNotGreater(end, nameof(start));
 
-            DateTime max = await Context.Statements.Where(s => s.SegmentId == segmentId).MaxAsync(s => s.Date);
-            DateTime startDate = start.StripSeconds();
-            DateTime endDate = LogicUtils.Min(end, max).StripSeconds();
-            string key = $"{startDate}_{endDate}_{segmentId}";
-            StatisticData? result = _segmentCash.Get(key);
+            start = start.Date;
+            end = end.Date.AddDays(1);
 
-            if (result is not null)
-            {
-                return result;
-            }
-
-            result = new StatisticData
+            return new StatisticData
             {
                 SegmentId = segmentId,
-                AcceptedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Accept, segmentId, startDate, endDate), start, end),
-                ShippedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Shipment, segmentId, startDate, endDate), start, end),
-                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, segmentId, startDate, endDate),
-                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, segmentId, startDate, endDate),
-                ProductsInStorageNow = await ProductWeightInStoragePer(segmentId, endDate),
-                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(segmentId, endDate),
-                WeightInStorageDynamic = LogicUtils.FillFullListPreviosValues(await WeightInStorageDynamic(segmentId, startDate, endDate), start, end)
+                AcceptedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Accept, segmentId, start, end), start, end),
+                ShippedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Shipment, segmentId, start, end), start, end),
+                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, segmentId, start, end),
+                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, segmentId, start, end),
+                ProductsInStorageNow = await ProductWeightInStoragePer(segmentId, end),
+                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(segmentId, end),
+                WeightInStorageDynamic = LogicUtils.FillFullListPreviosValues(await WeightInStorageDynamic(segmentId, start, end), start, end)
             };
-
-            _segmentCash.Set(key, result);
-
-            return result;
         }
 
         public async Task<StatisticData> GetAllWorkshopStatistic(DateTime start, DateTime end)
         {
             start.CheckNotGreater(end, nameof(start));
 
-            DateTime max = await Context.Statements.MaxAsync(s => s.Date);
-            DateTime startDate = start.StripSeconds();
-            DateTime endDate = LogicUtils.Min(end, max).StripSeconds();
-            string key = $"{startDate}_{endDate}";
-            StatisticData? result = _workshopCash.Get(key);
+            start = start.Date;
+            end = end.Date.AddDays(1);
 
-            if (result is not null)
+            return new StatisticData
             {
-                return result;
-            }
-
-            result = new StatisticData
-            {
-                AcceptedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Accept, null, startDate, endDate), start, end),
-                ShippedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Shipment, null, startDate, endDate), start, end),
-                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, null, startDate, endDate),
-                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, null, startDate, endDate),
-                ProductsInStorageNow = await ProductWeightInStoragePer(null, endDate),
-                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(null, endDate),
-                WeightInStorageDynamic = LogicUtils.FillFullListPreviosValues(await WeightInStorageDynamic(null, startDate, endDate), start, end)
+                AcceptedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Accept, null, start, end), start, end),
+                ShippedWeightDynamic = LogicUtils.FillFullListZeroValues(await DateGroupedWeight(StatementType.Shipment, null, start, end), start, end),
+                AcceptedProductsForPeriod = await ProductGroupedWeight(StatementType.Accept, null, start, end),
+                ShippedProductsForPeriod = await ProductGroupedWeight(StatementType.Shipment, null, start, end),
+                ProductsInStorageNow = await ProductWeightInStoragePer(null, end),
+                DefectedProductsInStorageNow = await DefectedProductsInStoragePer(null, end),
+                WeightInStorageDynamic = LogicUtils.FillFullListPreviosValues(await WeightInStorageDynamic(null, start, end), start, end)
             };
-
-            _workshopCash.Set(key, result);
-
-            return result;
         }
     }
 }

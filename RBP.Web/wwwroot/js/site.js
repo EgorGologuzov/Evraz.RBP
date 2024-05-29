@@ -17,7 +17,7 @@
 }
 
 $("form.need-validate")
-    .on("change paste keyup submit", function () {
+    .on("change keyup submit", function () {
         return validateForm($(this));
     })
     .each(function (i) {
